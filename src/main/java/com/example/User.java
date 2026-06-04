@@ -66,7 +66,7 @@ public class User {
     public void setAlbums(List<Album> albums) {
         this.albums = albums;
     }
-    //
+    
     public void addPicture(Picture picture) {
         pictures.add(picture);
     }
