@@ -66,7 +66,7 @@ public class User {
     public void setAlbums(List<Album> albums) {
         this.albums = albums;
     }
-    
+
     public void addPicture(Picture picture) {
         pictures.add(picture);
     }
@@ -81,5 +81,22 @@ public class User {
 
     public void removeAlbum(Album album) {
         albums.remove(album);
+    }
+
+    public void copyImageToAlbum(Picture picture, Album destAlbum) {
+        if (!destAlbum.getPictures().contains(picture)) {
+            List<Picture> list = destAlbum.getPictures();
+            list.add(picture);
+            destAlbum.setPictures(list);
+        }
+    }
+
+    public void transferImageToAnother(Picture picture, Album originAlbum, Album destAlbum) {
+        if (!destAlbum.getPictures().contains(picture)) {
+            copyImageToAlbum(picture, destAlbum);
+        }
+        List<Picture> list = originAlbum.getPictures();
+        list.remove(picture);
+        originAlbum.setPictures(list);
     }
 }
