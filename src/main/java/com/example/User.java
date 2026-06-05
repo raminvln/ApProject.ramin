@@ -1,5 +1,6 @@
 package com.example;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,7 @@ public class User {
         return isBanned;
     }
 
-    public void setBanned(boolean isBanned) {
+    protected void setBanned(boolean isBanned) {
         this.isBanned = isBanned;
     }
 
@@ -28,7 +29,7 @@ public class User {
     }
 
     // for changing username
-    void setNAme(String name) {
+    void setName(String name) {
         this.name = name;
     }
 
@@ -50,7 +51,10 @@ public class User {
     }
 
     public void addPicture(Picture picture) {
-        pictures.add(picture);
+        if (picture.getOwner().equals(this) && !pictures.contains(picture)) {
+            pictures.add(picture);
+            picture.setTimeOfAdd(LocalDateTime.now());
+        }
     }
 
     public void addAlbum(Album album) {
@@ -69,12 +73,20 @@ public class User {
         if (!destAlbum.getPictures().contains(picture)) {
             destAlbum.getPictures().add(picture);
         }
+        picture.getAlbums().add(destAlbum);
+        destAlbum.addPicture(this, picture);
     }
 
-    public void transferImageToAnother(Picture picture, Album originAlbum, Album destAlbum) {
+    public void moveImageToAnother(Picture picture, Album originAlbum, Album destAlbum) {
         if (!destAlbum.getPictures().contains(picture)) {
             copyImageToAlbum(picture, destAlbum);
         }
         originAlbum.getPictures().remove(picture);
+        picture.getAlbums().remove(originAlbum);
     }
+
+    public void likePicture(Picture picture) {
+        picture.increaseLikes();
+    }
+
 }
