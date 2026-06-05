@@ -19,6 +19,7 @@ public class Picture {
     private List<String> peopleInPicture = new ArrayList<>();
     private boolean isLikedByTheOwner = false;
     private int likes = 0;
+    private List<Comment> comments = new ArrayList<>();
 
     public Picture(String name, User owner) {
         this.name = name;
@@ -81,6 +82,10 @@ public class Picture {
         return name;
     }
 
+    public List<Comment> getComments() {
+        return comments;
+    }
+
     public boolean isCommentsAllowed() {
         return commentsAllowed;
     }
@@ -103,5 +108,9 @@ public class Picture {
 
     public void increaseLikes() {
         likes++;
+    }
+
+    public void addComment(Comment comment) {
+        comments.add(comment);
     }
 }
