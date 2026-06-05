@@ -3,18 +3,23 @@ package com.example;
 import java.util.*;
 
 public class Album {
+    private String name;
     List<Picture> pictures = new ArrayList<>();
 
-    public Album(List<Picture> pictures) {
-        this.pictures = pictures;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Album(String name) {
+        this.name = name;
     }
 
     public List<Picture> getPictures() {
         return pictures;
-    }
-
-    public void setPictures(List<Picture> pictures) {
-        this.pictures = pictures;
     }
 
     public void addPicture(Picture picture) {
