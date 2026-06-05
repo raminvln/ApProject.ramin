@@ -4,29 +4,29 @@ import java.util.*;
 
 public class Album {
     private String name;
-    List<Picture> pictures = new ArrayList<>();
+    private List<Picture> pictures = new ArrayList<>();
 
     public String getName() {
         return name;
     }
-
+    // for changing album name
     public void setName(String name) {
         this.name = name;
     }
 
-    public Album(String name) {
-        this.name = name;
-    }
 
     public List<Picture> getPictures() {
         return pictures;
     }
 
-    public void addPicture(Picture picture) {
-        pictures.add(picture);
+    public void addPicture(User user, Picture picture) {
+        if (user.getPictures().contains(picture) && !pictures.contains(picture)) {
+            pictures.add(picture);
+        }
     }
 
     public void removePicture(Picture picture) {
-        pictures.remove(picture);
+        if (pictures.contains(picture))
+            pictures.remove(picture);
     }
 }

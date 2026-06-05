@@ -6,13 +6,13 @@ import java.util.List;
 public class User {
     private boolean isBanned = false;
     private String name;
-    private String pssword;
+    private String password;
     private List<Picture> pictures = new ArrayList<>();
     private List<Album> albums = new ArrayList<>();
 
-    public User(String name, String pssword) {
+    public User(String name, String password) {
         this.name = name;
-        this.pssword = pssword;
+        this.password = password;
     }
 
     public boolean isBanned() {
@@ -27,8 +27,18 @@ public class User {
         return name;
     }
 
-    public String getPssword() {
-        return pssword;
+    // for changing username
+    void setNAme(String name) {
+        this.name = name;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    // for changing password
+    void setPassword(String password) {
+        this.password = password;
     }
 
     public List<Picture> getPictures() {
