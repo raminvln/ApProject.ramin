@@ -6,13 +6,13 @@ import java.util.List;
 
 public class User {
     private boolean isBanned = false;
-    private String name;
+    private String userName;
     private String password;
     private List<Picture> pictures = new ArrayList<>();
     private List<Album> albums = new ArrayList<>();
 
     public User(String name, String password) {
-        this.name = name;
+        this.userName = name;
         this.password = password;
     }
 
@@ -24,13 +24,13 @@ public class User {
         this.isBanned = isBanned;
     }
 
-    public String getName() {
-        return name;
+    public String getUserName() {
+        return userName;
     }
 
     // for changing username
-    void setName(String name) {
-        this.name = name;
+    void setUserName(String name) {
+        this.userName = name;
     }
 
     public String getPassword() {
@@ -73,7 +73,6 @@ public class User {
         if (!destAlbum.getPictures().contains(picture)) {
             destAlbum.getPictures().add(picture);
         }
-        picture.getAlbums().add(destAlbum);
         destAlbum.addPicture(this, picture);
     }
 
@@ -89,4 +88,28 @@ public class User {
         picture.increaseLikes();
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((userName == null) ? 0 : userName.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        User other = (User) obj;
+        if (userName == null) {
+            if (other.userName != null)
+                return false;
+        } else if (!userName.equals(other.userName))
+            return false;
+        return true;
+    }
 }
