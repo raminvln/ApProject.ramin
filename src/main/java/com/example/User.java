@@ -71,9 +71,9 @@ public class User {
 
     public void copyImageToAlbum(Picture picture, Album destAlbum) {
         if (!destAlbum.getPictures().contains(picture)) {
-            destAlbum.getPictures().add(picture);
+            destAlbum.addPicture(this, picture);
         }
-        destAlbum.addPicture(this, picture);
+
     }
 
     public void moveImageToAnother(Picture picture, Album originAlbum, Album destAlbum) {
