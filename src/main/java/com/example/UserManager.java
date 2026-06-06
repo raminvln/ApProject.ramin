@@ -36,4 +36,12 @@ public class UserManager {
     public static List<User> getUsers() {
         return users;
     }
+    public static boolean  userNameExists(String userName) {
+        for (User user : users) {
+            if (userName.equals(user.getUserName())) {
+                return true;
+            }
+        }
+        return false;
+    } 
 }
