@@ -4,10 +4,19 @@ import java.util.*;
 
 public class Album {
     private String name;
+    private User owner;
     private List<Picture> pictures = new ArrayList<>();
+
+    public Album(String name,User owner) {
+        this.name = name;
+        this.owner = owner;
+    }
 
     public String getName() {
         return name;
+    }
+    public User getOwner() {
+        return owner;
     }
 
     // for changing album name

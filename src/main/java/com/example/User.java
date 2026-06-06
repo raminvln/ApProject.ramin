@@ -5,11 +5,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    private boolean isBanned = false;
     private String userName;
     private String password;
     private List<Picture> pictures = new ArrayList<>();
     private List<Album> albums = new ArrayList<>();
+    private boolean isBanned = false;
 
     public User(String name, String password) {
         this.userName = name;
@@ -111,5 +111,10 @@ public class User {
         } else if (!userName.equals(other.userName))
             return false;
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "User [userName=" + userName + ", password=" + password + "]";
     }
 }
