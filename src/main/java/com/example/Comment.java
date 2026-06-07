@@ -7,10 +7,9 @@ public class Comment {
     private String text;
     private LocalDateTime creationTime;
 
-    public Comment(User author, String text, LocalDateTime creationTime) {
+    public Comment(User author, String text) {
         this.author = author;
         this.text = text;
-        this.creationTime = creationTime;
     }
 
     public User getAuthor() {
@@ -23,6 +22,10 @@ public class Comment {
 
     public LocalDateTime getCreationTime() {
         return creationTime;
+    }
+
+    public void setCreationTime(LocalDateTime creationTime) {
+        this.creationTime = creationTime;
     }
 
 }

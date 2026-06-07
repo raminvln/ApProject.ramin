@@ -117,6 +117,7 @@ public class Picture {
             likers.add(user);
         }
     }
+
     public void decreasLikes(User user) {
         if (likers.contains(user)) {
             likes--;
@@ -124,9 +125,11 @@ public class Picture {
         }
     }
 
-
     public void addComment(Comment comment) {
-        comments.add(comment);
+        if (isPublic) {
+            comments.add(comment);
+            comment.setCreationTime(LocalDateTime.now());
+        }
     }
 
     @Override
