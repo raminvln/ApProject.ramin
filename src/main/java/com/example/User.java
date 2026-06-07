@@ -29,7 +29,7 @@ public class User {
     }
 
     // for changing username
-    void setUserName(String name) {
+    public void setUserName(String name) {
         this.userName = name;
     }
 
@@ -38,7 +38,7 @@ public class User {
     }
 
     // for changing password
-    void setPassword(String password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 
