@@ -20,6 +20,11 @@ public class Picture {
     private boolean isLikedByTheOwner = false;
     private int likes = 0;
     private List<Comment> comments = new ArrayList<>();
+    private List<User> likers = new ArrayList<>();
+
+    public List<User> getLikers() {
+        return likers;
+    }
 
     public Picture(String name, User owner) {
         this.name = name;
@@ -106,11 +111,26 @@ public class Picture {
         peopleInPicture.add(person);
     }
 
-    public void increaseLikes() {
-        likes++;
+    public void increaseLikes(User user) {
+        if (!likers.contains(user)) {
+            likes++;
+            likers.add(user);
+        }
     }
+    public void decreasLikes(User user) {
+        if (likers.contains(user)) {
+            likes--;
+            likers.remove(user);
+        }
+    }
+
 
     public void addComment(Comment comment) {
         comments.add(comment);
+    }
+
+    @Override
+    public String toString() {
+        return "Picture [name=" + name + ", owner=" + owner + ", timeOfAdd=" + timeOfAdd + "]";
     }
 }

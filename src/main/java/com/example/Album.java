@@ -28,8 +28,8 @@ public class Album {
         return pictures;
     }
 
-    public void addPicture(User user, Picture picture) {
-        if (user.getPictures().contains(picture) && !pictures.contains(picture)) {
+    public void addPicture(Picture picture) {
+        if (owner.getPictures().contains(picture) && !pictures.contains(picture) && owner.equals(picture.getOwner())) {
             pictures.add(picture);
             picture.getAlbums().add(this);
         }

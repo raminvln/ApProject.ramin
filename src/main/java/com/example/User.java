@@ -58,7 +58,9 @@ public class User {
     }
 
     public void addAlbum(Album album) {
-        albums.add(album);
+        if (album.getOwner().equals(this) && !albums.contains(album)) {
+            albums.add(album);
+        }
     }
 
     public void removePicture(Picture picture) {
@@ -70,22 +72,30 @@ public class User {
     }
 
     public void copyImageToAlbum(Picture picture, Album destAlbum) {
-        if (!destAlbum.getPictures().contains(picture)) {
-            destAlbum.addPicture(this, picture);
+        if (!destAlbum.getPictures().contains(picture) && destAlbum.getOwner().equals(this)
+                && picture.getOwner().equals(this)) {
+            destAlbum.addPicture(picture);
         }
 
     }
 
     public void moveImageToAnother(Picture picture, Album originAlbum, Album destAlbum) {
-        if (!destAlbum.getPictures().contains(picture)) {
+        if (!destAlbum.getPictures().contains(picture) && destAlbum.getOwner().equals(this)
+                && originAlbum.getOwner().equals(this) && picture.getOwner().equals(this)) {
             copyImageToAlbum(picture, destAlbum);
+            originAlbum.removePicture(picture);
+            picture.getAlbums().remove(originAlbum);
         }
-        originAlbum.getPictures().remove(picture);
-        picture.getAlbums().remove(originAlbum);
     }
 
     public void likePicture(Picture picture) {
-        picture.increaseLikes();
+        if (picture.isPublic()) {
+            picture.increaseLikes(this);
+        }
+    }
+
+    public void unLikePicture(Picture picture) {
+        picture.decreasLikes(this);
     }
 
     @Override
