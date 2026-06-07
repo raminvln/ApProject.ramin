@@ -66,9 +66,9 @@ public class SearchManager {
                 .collect(Collectors.toList());
     }
 
-    public static List<Picture> filterAfterThisDate(User user, LocalDate date) {
+    public static List<Picture> filterAfterThisDate(User user, LocalDateTime dateTime) {
         return user.getPictures().stream()
-                .filter(picture -> picture.getTimeOfAdd().toLocalDate().isAfter(date))
+                .filter(picture -> picture.getTimeOfAdd().isAfter(dateTime))
                 .collect(Collectors.toList());
     }
 }
