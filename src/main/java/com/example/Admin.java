@@ -1,5 +1,7 @@
 package com.example;
 
+import java.io.IOException;
+
 public class Admin extends User {
 
     public Admin(String name, String password) {
@@ -18,14 +20,24 @@ public class Admin extends User {
         if (UserManager.isUserNameAllowed(newName)) {
             if (!UserManager.userNameExists(newName)) {
                 user.setUserName(newName);
-                
+                try {
+                    DataBase.saveUsersToFile();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
     }
 
     public void changePassword(User user, String newPassword) {
-        if (UserManager.isPasswordAllowed(newPassword))
+        if (UserManager.isPasswordAllowed(newPassword)){
             user.setPassword(newPassword);
+            try {
+                DataBase.saveUsersToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public int getPictureCount(User user) {

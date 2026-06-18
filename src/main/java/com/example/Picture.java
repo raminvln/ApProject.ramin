@@ -1,5 +1,6 @@
 package com.example;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -129,6 +130,11 @@ public class Picture {
         if (isPublic) {
             comments.add(comment);
             comment.setCreationTime(LocalDateTime.now());
+            try {
+                DataBase.saveUsersToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

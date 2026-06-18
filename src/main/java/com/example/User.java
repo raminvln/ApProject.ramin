@@ -1,5 +1,6 @@
 package com.example;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -54,42 +55,74 @@ public class User {
         if (!isBanned && picture.getOwnerName().equals(userName) && !pictures.contains(picture)) {
             pictures.add(picture);
             picture.setTimeOfAdd(LocalDateTime.now());
+            try {
+                DataBase.saveUsersToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void addAlbum(Album album) {
         if (!isBanned && album.getOwnerName().equals(userName) && !albums.contains(album)) {
             albums.add(album);
+            try {
+                DataBase.saveUsersToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
     public void removePicture(Picture picture) {
-        if (!isBanned)
+        if (!isBanned) {
             pictures.remove(picture);
+            try {
+                DataBase.saveUsersToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void removeAlbum(Album album) {
-        if (!isBanned)
+        if (!isBanned) {
             albums.remove(album);
+            try {
+                DataBase.saveUsersToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
-    public void copyImageToAlbum(Picture picture, Album destAlbum) {
+    public void copyImageToAlbum(Picture picture, Album destAlbum)  {
         if (!isBanned && !destAlbum.getPictures().contains(picture) && destAlbum.getOwnerName().equals(userName)
                 && picture.getOwnerName().equals(userName)) {
-            destAlbum.addPicture(picture);
+            try {
+                destAlbum.addPicture(picture);
+                DataBase.saveUsersToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
     }
 
-    public void moveImageToAnother(Picture picture, Album originAlbum, Album destAlbum) {
+    public void moveImageToAnother(Picture picture, Album originAlbum, Album destAlbum)  {
         if (!isBanned && !destAlbum.getPictures().contains(picture) && destAlbum.getOwnerName().equals(userName)
                 && originAlbum.getOwnerName().equals(userName) && picture.getOwnerName().equals(userName)) {
             copyImageToAlbum(picture, destAlbum);
-            originAlbum.removePicture(picture);
+            try {
+                originAlbum.removePicture(picture);
+                DataBase.saveUsersToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
             picture.getAlbumsNames().remove(originAlbum.getName());
         }
     }
-
+// این دو تا فعلا سیو ندارن
     public void changeUserName(String newName) {
         if (!isBanned && UserManager.isUserNameAllowed(newName)) {
             if (!UserManager.userNameExists(newName)) {
@@ -103,15 +136,27 @@ public class User {
             password = newPassword;
     }
 
-    public void likePicture(Picture picture) {
+    public void likePicture(Picture picture)  {
         if (!isBanned && picture.isPublic()) {
             picture.increaseLikes(this);
+            try {
+                DataBase.saveUsersToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public void unLikePicture(Picture picture) {
-        if (!isBanned)
+    public void unLikePicture(Picture picture)  {
+        if (!isBanned) {
             picture.decreasLikes(this);
+            try {
+                DataBase.saveUsersToFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     @Override
