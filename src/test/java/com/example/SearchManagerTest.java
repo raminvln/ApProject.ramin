@@ -35,23 +35,23 @@ public class SearchManagerTest {
         ali = new User("AliAlavi@gmail.com", "abcdDEfg3456");
         taghi = new User("TaghiTaghavi@gmail.com", "hijkLmNoe345");
 
-        p1 = new Picture("pride.jpg", ali);
-        p2 = new Picture("l90.jpg", ali);
-        p3 = new Picture("roz.jpg", ali);
-        p4 = new Picture("narges.jpg", ali);
-        p5 = new Picture("laleh.jpg", ali);
+        p1 = new Picture("pride.jpg", ali.getUserName());
+        p2 = new Picture("l90.jpg", ali.getUserName());
+        p3 = new Picture("roz.jpg", ali.getUserName());
+        p4 = new Picture("narges.jpg", ali.getUserName());
+        p5 = new Picture("laleh.jpg", ali.getUserName());
 
-        p6 = new Picture("peikan.jpg", taghi);
-        p7 = new Picture("dena.jpg", taghi);
-        p8 = new Picture("shahin.jpg", taghi);
-        p9 = new Picture("meimoon.jpg", taghi);
-        p10 = new Picture("yakh.jpg", taghi);
+        p6 = new Picture("peikan.jpg", taghi.getUserName());
+        p7 = new Picture("dena.jpg", taghi.getUserName());
+        p8 = new Picture("shahin.jpg", taghi.getUserName());
+        p9 = new Picture("meimoon.jpg", taghi.getUserName());
+        p10 = new Picture("yakh.jpg", taghi.getUserName());
 
-        a1 = new Album("mashin", ali);
-        a2 = new Album("gol", ali);
+        a1 = new Album("mashin", ali.getUserName());
+        a2 = new Album("gol", ali.getUserName());
 
-        a3 = new Album("mashin", taghi);
-        a4 = new Album("gol", taghi);
+        a3 = new Album("mashin", taghi.getUserName());
+        a4 = new Album("gol", taghi.getUserName());
 
         UserManager.addUser(ali);
         UserManager.addUser(taghi);
