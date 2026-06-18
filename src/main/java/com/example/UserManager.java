@@ -36,6 +36,9 @@ public class UserManager {
     public static List<User> getUsers() {
         return users;
     }
+    public static void setUsers(List<User> users2) {
+        users = users2;
+    }
     public static boolean  userNameExists(String userName) {
         for (User user : users) {
             if (userName.equals(user.getUserName())) {
