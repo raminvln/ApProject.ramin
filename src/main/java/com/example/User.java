@@ -51,51 +51,67 @@ public class User {
     }
 
     public void addPicture(Picture picture) {
-        if (picture.getOwner().equals(this) && !pictures.contains(picture)) {
+        if (!isBanned && picture.getOwnerName().equals(userName) && !pictures.contains(picture)) {
             pictures.add(picture);
             picture.setTimeOfAdd(LocalDateTime.now());
         }
     }
 
     public void addAlbum(Album album) {
-        if (album.getOwner().equals(this) && !albums.contains(album)) {
+        if (!isBanned && album.getOwnerName().equals(userName) && !albums.contains(album)) {
             albums.add(album);
         }
     }
 
     public void removePicture(Picture picture) {
-        pictures.remove(picture);
+        if (!isBanned)
+            pictures.remove(picture);
     }
 
     public void removeAlbum(Album album) {
-        albums.remove(album);
+        if (!isBanned)
+            albums.remove(album);
     }
 
     public void copyImageToAlbum(Picture picture, Album destAlbum) {
-        if (!destAlbum.getPictures().contains(picture) && destAlbum.getOwner().equals(this)
-                && picture.getOwner().equals(this)) {
+        if (!isBanned && !destAlbum.getPictures().contains(picture) && destAlbum.getOwnerName().equals(userName)
+                && picture.getOwnerName().equals(userName)) {
             destAlbum.addPicture(picture);
         }
 
     }
 
     public void moveImageToAnother(Picture picture, Album originAlbum, Album destAlbum) {
-        if (!destAlbum.getPictures().contains(picture) && destAlbum.getOwner().equals(this)
-                && originAlbum.getOwner().equals(this) && picture.getOwner().equals(this)) {
+        if (!isBanned && !destAlbum.getPictures().contains(picture) && destAlbum.getOwnerName().equals(userName)
+                && originAlbum.getOwnerName().equals(userName) && picture.getOwnerName().equals(userName)) {
             copyImageToAlbum(picture, destAlbum);
             originAlbum.removePicture(picture);
-            picture.getAlbums().remove(originAlbum);
+            picture.getAlbumsNames().remove(originAlbum.getName());
         }
     }
 
+    public void changeUserName(String newName) {
+        if (!isBanned && UserManager.isUserNameAllowed(newName)) {
+            if (!UserManager.userNameExists(newName)) {
+                userName = newName;
+            }
+        }
+    }
+
+    public void changePassword(String newPassword) {
+        if (!isBanned && UserManager.isPasswordAllowed(newPassword))
+            password = newPassword;
+    }
+
     public void likePicture(Picture picture) {
-        if (picture.isPublic()) {
+        if (!isBanned && picture.isPublic()) {
             picture.increaseLikes(this);
         }
     }
 
     public void unLikePicture(Picture picture) {
-        picture.decreasLikes(this);
+        if (!isBanned)
+            picture.decreasLikes(this);
     }
 
     @Override

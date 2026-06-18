@@ -4,19 +4,20 @@ import java.util.*;
 
 public class Album {
     private String name;
-    private User owner;
+    private String ownerName;
     private List<Picture> pictures = new ArrayList<>();
 
-    public Album(String name,User owner) {
+    public Album(String name, String ownerName) {
         this.name = name;
-        this.owner = owner;
+        this.ownerName = ownerName;
     }
 
     public String getName() {
         return name;
     }
-    public User getOwner() {
-        return owner;
+
+    public String getOwnerName() {
+        return ownerName;
     }
 
     // for changing album name
@@ -29,16 +30,22 @@ public class Album {
     }
 
     public void addPicture(Picture picture) {
-        if (owner.getPictures().contains(picture) && !pictures.contains(picture) && owner.equals(picture.getOwner())) {
+        if (UserManager.getUsers().stream()
+                .filter(user -> user.getUserName().equals(ownerName))
+                .findFirst()
+                .orElse(null)
+                .getPictures()
+                .contains(picture) && !pictures.contains(picture)
+                && ownerName.equals(picture.getOwnerName())) {
             pictures.add(picture);
-            picture.getAlbums().add(this);
+            picture.getAlbumsNames().add(name);
         }
     }
 
     public void removePicture(Picture picture) {
         if (pictures.contains(picture)) {
             pictures.remove(picture);
-            picture.getAlbums().remove(this);
+            picture.getAlbumsNames().remove(name);
         }
     }
 }

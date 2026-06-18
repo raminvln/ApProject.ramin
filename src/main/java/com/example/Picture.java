@@ -9,11 +9,11 @@ public class Picture {
     // ینی این عکس توی گالری گوشی فرد هست و تا اون را اضافه نکنه خب توی حساب کاربریش
     // نمیاد
     private String name;
-    private User owner;
+    private String ownerName;
     private boolean commentsAllowed = false;
     private boolean isPublic = false;
     private LocalDateTime timeOfAdd;
-    private List<Album> albums = new ArrayList<>();
+    private List<String> albumNames = new ArrayList<>();
     private List<String> tags = new ArrayList<>();
     private String caption;
     private List<String> peopleInPicture = new ArrayList<>();
@@ -26,9 +26,9 @@ public class Picture {
         return likers;
     }
 
-    public Picture(String name, User owner) {
+    public Picture(String name, String ownerName) {
         this.name = name;
-        this.owner = owner;
+        this.ownerName = ownerName;
     }
 
     public String getCaption() {
@@ -51,8 +51,8 @@ public class Picture {
         this.isLikedByTheOwner = isLiked;
     }
 
-    public List<Album> getAlbums() {
-        return albums;
+    public List<String> getAlbumsNames() {
+        return albumNames;
     }
 
     public List<String> getTags() {
@@ -71,8 +71,8 @@ public class Picture {
         return timeOfAdd;
     }
 
-    public User getOwner() {
-        return owner;
+    public String getOwnerName() {
+        return ownerName;
     }
 
     public void setTimeOfAdd(LocalDateTime timeOfAdd) {
@@ -134,6 +134,6 @@ public class Picture {
 
     @Override
     public String toString() {
-        return "Picture [name=" + name + ", owner=" + owner + ", timeOfAdd=" + timeOfAdd + "]";
+        return "Picture [name=" + name + ", ownerName=" + ownerName + ", timeOfAdd=" + timeOfAdd + "]";
     }
 }

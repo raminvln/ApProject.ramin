@@ -16,8 +16,9 @@ public class Admin extends User {
 
     public void changeUserName(User user, String newName) {
         if (UserManager.isUserNameAllowed(newName)) {
-            if (UserManager.userNameExists(newName)) {
+            if (!UserManager.userNameExists(newName)) {
                 user.setUserName(newName);
+                
             }
         }
     }
