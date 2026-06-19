@@ -57,8 +57,8 @@ public class PictureTest {
 
     @Test
     public void addCommentTest() {
-        Comment comment1 = new Comment(ali, "it is beautiful");
-        Comment comment2 = new Comment(taghi, "OMG");
+        Comment comment1 = new Comment(ali.getUserName(), "it is beautiful");
+        Comment comment2 = new Comment(taghi.getUserName(), "OMG");
         p9.addComment(comment2);
         p9.addComment(comment1);
         assertEquals(0, p9.getComments().size());

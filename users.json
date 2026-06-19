@@ -1,23 +1,248 @@
 [
   {
-    "userName": "AdiAdavi@gmail.com",
-    "password": "adminHASTAM123456",
-    "pictures": [],
-    "albums": [],
-    "isBanned": false
-  },
-  {
     "userName": "AliAlavi@gmail.com",
-    "password": "azinbebaaD3437",
-    "pictures": [],
-    "albums": [],
+    "password": "abcdDEfg3456",
+    "pictures": [
+      {
+        "name": "pride.jpg",
+        "ownerName": "AliAlavi@gmail.com",
+        "commentsAllowed": false,
+        "isPublic": true,
+        "timeOfAdd": "2026-06-19T18:36:23.185377400",
+        "albumNames": [
+          "mashin"
+        ],
+        "tags": [
+          "car",
+          "iran"
+        ],
+        "peopleInPicture": [],
+        "isLikedByTheOwner": false,
+        "likes": 0,
+        "comments": [
+          {
+            "authorName": "TaghiTaghavi@gmail.com",
+            "text": "beautiful car",
+            "creationTime": "2026-06-19T18:36:23.210383500"
+          },
+          {
+            "authorName": "TaghiTaghavi@gmail.com",
+            "text": "red car",
+            "creationTime": "2026-06-19T18:36:23.211393900"
+          }
+        ],
+        "likers": []
+      },
+      {
+        "name": "l90.jpg",
+        "ownerName": "AliAlavi@gmail.com",
+        "commentsAllowed": false,
+        "isPublic": true,
+        "timeOfAdd": "2026-06-19T18:36:23.186374300",
+        "albumNames": [
+          "mashin"
+        ],
+        "tags": [
+          "car"
+        ],
+        "peopleInPicture": [],
+        "isLikedByTheOwner": false,
+        "likes": 0,
+        "comments": [
+          {
+            "authorName": "TaghiTaghavi@gmail.com",
+            "text": "old car",
+            "creationTime": "2026-06-19T18:36:23.212382300"
+          }
+        ],
+        "likers": []
+      },
+      {
+        "name": "roz.jpg",
+        "ownerName": "AliAlavi@gmail.com",
+        "commentsAllowed": false,
+        "isPublic": true,
+        "timeOfAdd": "2026-06-19T18:36:23.187375500",
+        "albumNames": [
+          "gol"
+        ],
+        "tags": [
+          "flower"
+        ],
+        "peopleInPicture": [],
+        "isLikedByTheOwner": false,
+        "likes": 0,
+        "comments": [
+          {
+            "authorName": "AliAlavi@gmail.com",
+            "text": "nice flower",
+            "creationTime": "2026-06-19T18:36:23.213380500"
+          }
+        ],
+        "likers": []
+      },
+      {
+        "name": "narges.jpg",
+        "ownerName": "AliAlavi@gmail.com",
+        "commentsAllowed": false,
+        "isPublic": false,
+        "timeOfAdd": "2026-06-19T18:36:23.188377500",
+        "albumNames": [
+          "gol"
+        ],
+        "tags": [
+          "flower"
+        ],
+        "peopleInPicture": [],
+        "isLikedByTheOwner": false,
+        "likes": 0,
+        "comments": [],
+        "likers": []
+      },
+      {
+        "name": "laleh.jpg",
+        "ownerName": "AliAlavi@gmail.com",
+        "commentsAllowed": false,
+        "isPublic": false,
+        "timeOfAdd": "2026-06-19T18:36:23.189377200",
+        "albumNames": [
+          "gol"
+        ],
+        "tags": [
+          "nature"
+        ],
+        "peopleInPicture": [],
+        "isLikedByTheOwner": false,
+        "likes": 0,
+        "comments": [],
+        "likers": []
+      }
+    ],
+    "albums": [
+      {
+        "name": "mashin",
+        "ownerName": "AliAlavi@gmail.com",
+        "pictureNames": [
+          "pride.jpg",
+          "l90.jpg"
+        ]
+      },
+      {
+        "name": "gol",
+        "ownerName": "AliAlavi@gmail.com",
+        "pictureNames": [
+          "roz.jpg",
+          "narges.jpg",
+          "laleh.jpg"
+        ]
+      }
+    ],
     "isBanned": false
   },
   {
     "userName": "TaghiTaghavi@gmail.com",
-    "password": "null)::PE34",
-    "pictures": [],
-    "albums": [],
+    "password": "hijkLmNoe345",
+    "pictures": [
+      {
+        "name": "peikan.jpg",
+        "ownerName": "TaghiTaghavi@gmail.com",
+        "commentsAllowed": false,
+        "isPublic": false,
+        "timeOfAdd": "2026-06-19T18:36:23.190375400",
+        "albumNames": [
+          "mashin"
+        ],
+        "tags": [],
+        "peopleInPicture": [],
+        "isLikedByTheOwner": false,
+        "likes": 0,
+        "comments": [],
+        "likers": []
+      },
+      {
+        "name": "dena.jpg",
+        "ownerName": "TaghiTaghavi@gmail.com",
+        "commentsAllowed": false,
+        "isPublic": false,
+        "timeOfAdd": "2026-06-19T18:36:23.191376600",
+        "albumNames": [
+          "mashin"
+        ],
+        "tags": [],
+        "peopleInPicture": [],
+        "isLikedByTheOwner": false,
+        "likes": 0,
+        "comments": [],
+        "likers": []
+      },
+      {
+        "name": "shahin.jpg",
+        "ownerName": "TaghiTaghavi@gmail.com",
+        "commentsAllowed": false,
+        "isPublic": false,
+        "timeOfAdd": "2026-06-19T18:36:23.193377600",
+        "albumNames": [
+          "mashin"
+        ],
+        "tags": [],
+        "peopleInPicture": [],
+        "isLikedByTheOwner": false,
+        "likes": 0,
+        "comments": [],
+        "likers": []
+      },
+      {
+        "name": "meimoon.jpg",
+        "ownerName": "TaghiTaghavi@gmail.com",
+        "commentsAllowed": false,
+        "isPublic": false,
+        "timeOfAdd": "2026-06-19T18:36:23.194376300",
+        "albumNames": [
+          "gol"
+        ],
+        "tags": [],
+        "peopleInPicture": [],
+        "isLikedByTheOwner": false,
+        "likes": 0,
+        "comments": [],
+        "likers": []
+      },
+      {
+        "name": "yakh.jpg",
+        "ownerName": "TaghiTaghavi@gmail.com",
+        "commentsAllowed": false,
+        "isPublic": false,
+        "timeOfAdd": "2026-06-19T18:36:23.195378",
+        "albumNames": [
+          "gol"
+        ],
+        "tags": [],
+        "peopleInPicture": [],
+        "isLikedByTheOwner": false,
+        "likes": 0,
+        "comments": [],
+        "likers": []
+      }
+    ],
+    "albums": [
+      {
+        "name": "mashin",
+        "ownerName": "TaghiTaghavi@gmail.com",
+        "pictureNames": [
+          "peikan.jpg",
+          "dena.jpg",
+          "shahin.jpg"
+        ]
+      },
+      {
+        "name": "gol",
+        "ownerName": "TaghiTaghavi@gmail.com",
+        "pictureNames": [
+          "meimoon.jpg",
+          "yakh.jpg"
+        ]
+      }
+    ],
     "isBanned": false
   }
 ]

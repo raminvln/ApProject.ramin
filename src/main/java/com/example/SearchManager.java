@@ -11,7 +11,7 @@ public class SearchManager {
         public static List<Picture> searchByAlbum(String albumName, User user) {
                 return user.getPictures().stream()
                                 .filter(picture -> picture.getAlbumsNames().stream()
-                                                .anyMatch(name -> name.contains(albumName)))
+                                                .anyMatch(name -> name.toLowerCase().contains(albumName.toLowerCase())))
                                 .collect(Collectors.toList());
         }
 

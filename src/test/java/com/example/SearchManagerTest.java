@@ -97,10 +97,10 @@ public class SearchManagerTest {
         p1.setPublic(true);
         p2.setPublic(true);
         p3.setPublic(true);
-        p1.addComment(new Comment(taghi, "beautiful car"));
-        p1.addComment(new Comment(taghi, "red car"));
-        p2.addComment(new Comment(taghi, "old car"));
-        p3.addComment(new Comment(ali, "nice flower"));
+        p1.addComment(new Comment(taghi.getUserName(), "beautiful car"));
+        p1.addComment(new Comment(taghi.getUserName(), "red car"));
+        p2.addComment(new Comment(taghi.getUserName(), "old car"));
+        p3.addComment(new Comment(ali.getUserName(), "nice flower"));
     }
 
     @Test
@@ -110,6 +110,7 @@ public class SearchManagerTest {
         assertEquals(2, result.size());
         assertTrue(result.contains(p1));
         assertTrue(result.contains(p2));
+        assertTrue(true);
     }
 
     @Test

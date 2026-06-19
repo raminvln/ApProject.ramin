@@ -3,17 +3,17 @@ package com.example;
 import java.time.*;
 
 public class Comment {
-    private User author;
+    private String authorName;
     private String text;
     private LocalDateTime creationTime;
 
-    public Comment(User author, String text) {
-        this.author = author;
+    public Comment(String authorName, String text) {
+        this.authorName = authorName;
         this.text = text;
     }
 
-    public User getAuthor() {
-        return author;
+    public String getAuthor() {
+        return authorName;
     }
 
     public String getText() {
