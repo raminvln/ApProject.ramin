@@ -229,49 +229,49 @@ public class UserAndAlbumTest {
         assertEquals(3, a3.getPictures().size());
         assertEquals(2, a4.getPictures().size());
 
-        assertTrue(a1.getPictures().contains(p1));
-        assertTrue(a1.getPictures().contains(p2));
-        assertFalse(a1.getPictures().contains(p3));
-        assertFalse(a1.getPictures().contains(p4));
-        assertFalse(a1.getPictures().contains(p5));
-        assertFalse(a1.getPictures().contains(p6));
-        assertFalse(a1.getPictures().contains(p7));
-        assertFalse(a1.getPictures().contains(p8));
-        assertFalse(a1.getPictures().contains(p9));
-        assertFalse(a1.getPictures().contains(p10));
+        assertTrue(a1.getPictures().contains(p1.getName()));
+        assertTrue(a1.getPictures().contains(p2.getName()));
+        assertFalse(a1.getPictures().contains(p3.getName()));
+        assertFalse(a1.getPictures().contains(p4.getName()));
+        assertFalse(a1.getPictures().contains(p5.getName()));
+        assertFalse(a1.getPictures().contains(p6.getName()));
+        assertFalse(a1.getPictures().contains(p7.getName()));
+        assertFalse(a1.getPictures().contains(p8.getName()));
+        assertFalse(a1.getPictures().contains(p9.getName()));
+        assertFalse(a1.getPictures().contains(p10.getName()));
 
-        assertTrue(a2.getPictures().contains(p3));
-        assertTrue(a2.getPictures().contains(p4));
-        assertTrue(a2.getPictures().contains(p5));
-        assertFalse(a2.getPictures().contains(p1));
-        assertFalse(a2.getPictures().contains(p2));
-        assertFalse(a2.getPictures().contains(p6));
-        assertFalse(a2.getPictures().contains(p7));
-        assertFalse(a2.getPictures().contains(p8));
-        assertFalse(a2.getPictures().contains(p9));
-        assertFalse(a2.getPictures().contains(p10));
+        assertTrue(a2.getPictures().contains(p3.getName()));
+        assertTrue(a2.getPictures().contains(p4.getName()));
+        assertTrue(a2.getPictures().contains(p5.getName()));
+        assertFalse(a2.getPictures().contains(p1.getName()));
+        assertFalse(a2.getPictures().contains(p2.getName()));
+        assertFalse(a2.getPictures().contains(p6.getName()));
+        assertFalse(a2.getPictures().contains(p7.getName()));
+        assertFalse(a2.getPictures().contains(p8.getName()));
+        assertFalse(a2.getPictures().contains(p9.getName()));
+        assertFalse(a2.getPictures().contains(p10.getName()));
 
-        assertTrue(a3.getPictures().contains(p6));
-        assertTrue(a3.getPictures().contains(p7));
-        assertTrue(a3.getPictures().contains(p8));
-        assertFalse(a3.getPictures().contains(p1));
-        assertFalse(a3.getPictures().contains(p2));
-        assertFalse(a3.getPictures().contains(p3));
-        assertFalse(a3.getPictures().contains(p4));
-        assertFalse(a3.getPictures().contains(p5));
-        assertFalse(a3.getPictures().contains(p9));
-        assertFalse(a3.getPictures().contains(p10));
+        assertTrue(a3.getPictures().contains(p6.getName()));
+        assertTrue(a3.getPictures().contains(p7.getName()));
+        assertTrue(a3.getPictures().contains(p8.getName()));
+        assertFalse(a3.getPictures().contains(p1.getName()));
+        assertFalse(a3.getPictures().contains(p2.getName()));
+        assertFalse(a3.getPictures().contains(p3.getName()));
+        assertFalse(a3.getPictures().contains(p4.getName()));
+        assertFalse(a3.getPictures().contains(p5.getName()));
+        assertFalse(a3.getPictures().contains(p9.getName()));
+        assertFalse(a3.getPictures().contains(p10.getName()));
 
-        assertTrue(a4.getPictures().contains(p9));
-        assertTrue(a4.getPictures().contains(p10));
-        assertFalse(a4.getPictures().contains(p1));
-        assertFalse(a4.getPictures().contains(p2));
-        assertFalse(a4.getPictures().contains(p3));
-        assertFalse(a4.getPictures().contains(p4));
-        assertFalse(a4.getPictures().contains(p5));
-        assertFalse(a4.getPictures().contains(p6));
-        assertFalse(a4.getPictures().contains(p7));
-        assertFalse(a4.getPictures().contains(p8));
+        assertTrue(a4.getPictures().contains(p9.getName()));
+        assertTrue(a4.getPictures().contains(p10.getName()));
+        assertFalse(a4.getPictures().contains(p1.getName()));
+        assertFalse(a4.getPictures().contains(p2.getName()));
+        assertFalse(a4.getPictures().contains(p3.getName()));
+        assertFalse(a4.getPictures().contains(p4.getName()));
+        assertFalse(a4.getPictures().contains(p5.getName()));
+        assertFalse(a4.getPictures().contains(p6.getName()));
+        assertFalse(a4.getPictures().contains(p7.getName()));
+        assertFalse(a4.getPictures().contains(p8.getName()));
     }
 
     @Test
@@ -355,10 +355,10 @@ public class UserAndAlbumTest {
         taghi.copyImageToAlbum(p9, a4); // this picture already exists
         assertEquals(4, a2.getPictures().size());
         assertEquals(3, a4.getPictures().size());
-        assertTrue(a2.getPictures().contains(p2));
-        assertTrue(a4.getPictures().contains(p6));
-        assertFalse(a1.getPictures().contains(p6));
-        assertFalse(a4.getPictures().contains(p4));
+        assertTrue(a2.getPictures().contains(p2.getName()));
+        assertTrue(a4.getPictures().contains(p6.getName()));
+        assertFalse(a1.getPictures().contains(p6.getName()));
+        assertFalse(a4.getPictures().contains(p4.getName()));
     }
 
     @Test
@@ -401,17 +401,17 @@ public class UserAndAlbumTest {
         assertEquals(2, a3.getPictures().size());
         assertEquals(3, a4.getPictures().size());
 
-        assertTrue(a1.getPictures().contains(p1));
-        assertTrue(a2.getPictures().contains(p2));
-        assertTrue(a2.getPictures().contains(p3));
-        assertTrue(a2.getPictures().contains(p4));
-        assertTrue(a2.getPictures().contains(p5));
+        assertTrue(a1.getPictures().contains(p1.getName()));
+        assertTrue(a2.getPictures().contains(p2.getName()));
+        assertTrue(a2.getPictures().contains(p3.getName()));
+        assertTrue(a2.getPictures().contains(p4.getName()));
+        assertTrue(a2.getPictures().contains(p5.getName()));
 
-        assertTrue(a3.getPictures().contains(p7));
-        assertTrue(a3.getPictures().contains(p8));
-        assertTrue(a4.getPictures().contains(p6));
-        assertTrue(a4.getPictures().contains(p9));
-        assertTrue(a4.getPictures().contains(p10));
+        assertTrue(a3.getPictures().contains(p7.getName()));
+        assertTrue(a3.getPictures().contains(p8.getName()));
+        assertTrue(a4.getPictures().contains(p6.getName()));
+        assertTrue(a4.getPictures().contains(p9.getName()));
+        assertTrue(a4.getPictures().contains(p10.getName()));
     }
 
     @Test

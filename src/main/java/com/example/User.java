@@ -97,7 +97,7 @@ public class User {
     }
 
     public void copyImageToAlbum(Picture picture, Album destAlbum)  {
-        if (!isBanned && !destAlbum.getPictures().contains(picture) && destAlbum.getOwnerName().equals(userName)
+        if (!isBanned && !destAlbum.getPictures().contains(picture.getName()) && destAlbum.getOwnerName().equals(userName)
                 && picture.getOwnerName().equals(userName)) {
             try {
                 destAlbum.addPicture(picture);
@@ -110,7 +110,7 @@ public class User {
     }
 
     public void moveImageToAnother(Picture picture, Album originAlbum, Album destAlbum)  {
-        if (!isBanned && !destAlbum.getPictures().contains(picture) && destAlbum.getOwnerName().equals(userName)
+        if (!isBanned && !destAlbum.getPictures().contains(picture.getName()) && destAlbum.getOwnerName().equals(userName)
                 && originAlbum.getOwnerName().equals(userName) && picture.getOwnerName().equals(userName)) {
             copyImageToAlbum(picture, destAlbum);
             try {

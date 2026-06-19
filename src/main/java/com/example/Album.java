@@ -6,7 +6,7 @@ import java.util.*;
 public class Album {
     private String name;
     private String ownerName;
-    private List<Picture> pictures = new ArrayList<>();
+    private List<String> pictureNames = new ArrayList<>();
 
     public Album(String name, String ownerName) {
         this.name = name;
@@ -26,8 +26,8 @@ public class Album {
         this.name = name;
     }
 
-    public List<Picture> getPictures() {
-        return pictures;
+    public List<String> getPictures() {
+        return pictureNames;
     }
 
     public void addPicture(Picture picture)  {
@@ -36,9 +36,9 @@ public class Album {
                 .findFirst()
                 .orElse(null)
                 .getPictures()
-                .contains(picture) && !pictures.contains(picture)
+                .contains(picture) && !pictureNames.contains(picture.getName())
                 && ownerName.equals(picture.getOwnerName())) {
-            pictures.add(picture);
+            pictureNames.add(picture.getName());
             picture.getAlbumsNames().add(name);
             try {
                 DataBase.saveUsersToFile();
@@ -49,8 +49,8 @@ public class Album {
     }
 
     public void removePicture(Picture picture)  {
-        if (pictures.contains(picture)) {
-            pictures.remove(picture);
+        if (pictureNames.contains(picture.getName())) {
+            pictureNames.remove(picture.getName());
             picture.getAlbumsNames().remove(name);
             try {
                 DataBase.saveUsersToFile();
