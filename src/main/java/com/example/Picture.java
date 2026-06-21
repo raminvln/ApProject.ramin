@@ -21,10 +21,10 @@ public class Picture {
     private boolean isLikedByTheOwner = false;
     private int likes = 0;
     private List<Comment> comments = new ArrayList<>();
-    private List<User> likers = new ArrayList<>();
+    private List<String> likerNames = new ArrayList<>();
 
-    public List<User> getLikers() {
-        return likers;
+    public List<String> getLikers() {
+        return likerNames;
     }
 
     public Picture(String name, String ownerName) {
@@ -113,16 +113,16 @@ public class Picture {
     }
 
     public void increaseLikes(User user) {
-        if (!likers.contains(user)) {
+        if (!likerNames.contains(user.getUserName())) {
             likes++;
-            likers.add(user);
+            likerNames.add(user.getUserName());
         }
     }
 
     public void decreasLikes(User user) {
-        if (likers.contains(user)) {
+        if (likerNames.contains(user.getUserName())) {
             likes--;
-            likers.remove(user);
+            likerNames.remove(user.getUserName());
         }
     }
 

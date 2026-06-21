@@ -474,9 +474,9 @@ public class UserAndAlbumTest {
         assertEquals(2, p3.getLikes());
         assertEquals(2, p4.getLikes());
 
-        assertTrue(p1.getLikers().contains(mohammad));
-        assertTrue(p1.getLikers().contains(hasan));
-        assertTrue(p1.getLikers().contains(hossein));
+        assertTrue(p1.getLikers().contains(mohammad.getUserName()));
+        assertTrue(p1.getLikers().contains(hasan.getUserName()));
+        assertTrue(p1.getLikers().contains(hossein.getUserName()));
         hasan.unLikePicture(p1);
         assertEquals(2, p1.getLikes());
         mohammad.unLikePicture(p4); // mohammad hasn't liked this picture so it's likes number doesn't change
