@@ -101,7 +101,7 @@ class _LoginPageState extends State<LoginPage>
                     const SizedBox(height: 48),
                     // Welcome Text
                     Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: Alignment.center,
                       child: Text(
                         'Welcome Back',
                         style: TextStyle(

@@ -101,7 +101,7 @@ class _SignUpPageState extends State<SignUpPage>
                     const SizedBox(height: 48),
                     // Create Account Text
                     Align(
-                      alignment: Alignment.centerLeft,
+                      alignment: Alignment.center,
                       child: Text(
                         'Create Account',
                         style: TextStyle(
