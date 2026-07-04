@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import 'package:album_frontend/models/photo_model.dart';
 import 'package:album_frontend/services/mock_data.dart';
 
@@ -11,31 +10,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<PhotoModel> _photos;
-  late ScrollController _scrollController;
-  bool _isHeaderCollapsed = false;
+  late List<PhotoModel> _allPhotos;
+  late Map<String, List<PhotoModel>> _groupedPhotos;
+  final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   int _currentIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    _photos = MockData.getPhotos();
-    _scrollController = ScrollController();
-    _scrollController.addListener(_onScroll);
+    _allPhotos = MockData.getPhotos();
+    _groupedPhotos = MockData.groupByDate(_allPhotos);
   }
 
   @override
   void dispose() {
+    _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
-  }
-
-  void _onScroll() {
-    if (_scrollController.offset > 100 && !_isHeaderCollapsed) {
-      setState(() => _isHeaderCollapsed = true);
-    } else if (_scrollController.offset <= 100 && _isHeaderCollapsed) {
-      setState(() => _isHeaderCollapsed = false);
-    }
   }
 
   @override
@@ -43,129 +35,106 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
-        child: Stack(
+        child: Column(
           children: [
-            CustomScrollView(
-              controller: _scrollController,
-              slivers: [
-                // Header
-                SliverToBoxAdapter(child: _buildHeader()),
-                // Summary Card
-                SliverToBoxAdapter(child: _buildSummaryCard()),
-                // Section Title
-                SliverToBoxAdapter(child: _buildSectionTitle()),
-                // Photo Grid
-                SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 2),
-                  sliver: SliverGrid(
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 3,
-                      mainAxisSpacing: 2,
-                      crossAxisSpacing: 2,
-                    ),
-                    delegate: SliverChildBuilderDelegate(
-                      (context, index) => _buildPhotoTile(index),
-                      childCount: _photos.length,
-                    ),
+            // Header
+            _buildHeader(),
+            // Photo Grid
+            Expanded(
+              child: Scrollbar(
+                controller: _scrollController,
+                thickness: 4,
+                radius: const Radius.circular(8),
+                child: ListView.builder(
+                  controller: _scrollController,
+                  physics: const BouncingScrollPhysics(
+                    decelerationRate: ScrollDecelerationRate.fast,
                   ),
+                  padding: const EdgeInsets.only(bottom: 80),
+                  itemCount: _groupedPhotos.keys.length,
+                  itemBuilder: (context, index) {
+                    String dateKey = _groupedPhotos.keys.elementAt(index);
+                    List<PhotoModel> photos = _groupedPhotos[dateKey]!;
+                    return _buildDateSection(dateKey, photos);
+                  },
                 ),
-              ],
+              ),
             ),
-            // Floating Collapsed Header
-            if (_isHeaderCollapsed) _buildCollapsedHeader(),
           ],
         ),
       ),
+      floatingActionButton: _buildFloatingActionButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
       bottomNavigationBar: _buildBottomNav(),
     );
   }
 
   Widget _buildHeader() {
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      padding: EdgeInsets.fromLTRB(
-        20,
-        _isHeaderCollapsed ? 0 : 20,
-        20,
-        _isHeaderCollapsed ? 0 : 10,
-      ),
+    return Container(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Row(
-                children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF2563EB).withValues(alpha: 0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(Icons.waving_hand, color: Colors.white, size: 22),
-                  ),
-                  const SizedBox(width: 12),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Good Morning',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[500],
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                      const Text(
-                        '👋',
-                        style: TextStyle(fontSize: 20),
-                      ),
-                    ],
-                  ),
-                ],
+              const Text(
+                'Photos',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-              Row(
-                children: [
-                  _buildIconButton(Icons.search_outlined),
-                  const SizedBox(width: 4),
-                  _buildIconButton(Icons.settings_outlined),
-                ],
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).brightness == Brightness.dark
+                      ? const Color(0xFF1E293B)
+                      : Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.settings_outlined, size: 22),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          AnimatedSize(
-            duration: const Duration(milliseconds: 300),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Memories',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
+          // Search Field
+          TextField(
+            controller: _searchController,
+            onChanged: (value) {
+              // TODO: Implement search
+            },
+            decoration: InputDecoration(
+              hintText: 'Search photos...',
+              hintStyle: TextStyle(color: Colors.grey[400]),
+              prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+              filled: true,
+              fillColor: Theme.of(context).brightness == Brightness.dark
+                  ? const Color(0xFF1E293B)
+                  : const Color(0xFFF1F5F9),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(
+                  color: const Color(0xFF2563EB).withValues(alpha: 0.5),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${_photos.length} Photos',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[500],
-                  ),
-                ),
-              ],
+              ),
+              contentPadding: const EdgeInsets.symmetric(vertical: 14),
             ),
           ),
         ],
@@ -173,145 +142,67 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildIconButton(IconData icon) {
-    return Container(
-      width: 44,
-      height: 44,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Theme.of(context).brightness == Brightness.dark
-            ? const Color(0xFF1E293B)
-            : Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Icon(icon, size: 22, color: Colors.grey[600]),
-    );
-  }
-
-  Widget _buildCollapsedHeader() {
-    return Container(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'Memories',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          Row(
+  Widget _buildDateSection(String dateLabel, List<PhotoModel> photos) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Date Header
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
+          child: Row(
             children: [
-              _buildIconButton(Icons.search_outlined),
-              const SizedBox(width: 4),
-              _buildIconButton(Icons.settings_outlined),
+              Container(
+                width: 4,
+                height: 20,
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2563EB),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                dateLabel,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: Theme.of(context).textTheme.bodyLarge?.color,
+                ),
+              ),
+              const SizedBox(width: 10),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF2563EB).withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${photos.length}',
+                  style: const TextStyle(
+                    color: Color(0xFF2563EB),
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
             ],
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSummaryCard() {
-    final favoriteCount = _photos.where((p) => p.isFavorite).length;
-    final storagePercent = 84;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
-          gradient: const LinearGradient(
-            colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: const Color(0xFF2563EB).withValues(alpha: 0.3),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
-            ),
-          ],
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildSummaryItem('Photos', '${_photos.length}'),
-            _buildSummaryItem('Favorites', '$favoriteCount'),
-            _buildSummaryItem('Storage', '$storagePercent%'),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildSummaryItem(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.white.withValues(alpha: 0.8),
-            fontSize: 13,
+        // Photo Grid
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: photos.map((photo) => _buildPhotoCard(photo)).toList(),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSectionTitle() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 12),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          const Text(
-            'All Photos',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          Text(
-            'See All',
-            style: TextStyle(
-              color: const Color(0xFF2563EB),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPhotoTile(int index) {
-    final photo = _photos[index];
-    final random = Random(index);
-    final height = (index % 3 == 0)
-        ? 180.0
-        : (index % 5 == 0)
-            ? 160.0
-            : 140.0;
+  Widget _buildPhotoCard(PhotoModel photo) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final cardWidth = (screenWidth - 48) / 3;
 
     return GestureDetector(
       onTap: () {
@@ -320,67 +211,129 @@ class _HomePageState extends State<HomePage> {
       child: Hero(
         tag: photo.id,
         child: Container(
+          width: cardWidth,
+          height: cardWidth,
           decoration: BoxDecoration(
-            image: DecorationImage(
-              image: NetworkImage(photo.url),
-              fit: BoxFit.cover,
-            ),
+            borderRadius: BorderRadius.circular(12),
+            color: _getColorForPhoto(photo),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: Stack(
             children: [
+              // Center text
+              Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    photo.title,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
               // Gradient overlay at bottom
               Positioned(
                 bottom: 0,
                 left: 0,
                 right: 0,
                 child: Container(
-                  height: 40,
+                  height: 30,
                   decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.only(
+                      bottomLeft: Radius.circular(12),
+                      bottomRight: Radius.circular(12),
+                    ),
                     gradient: LinearGradient(
                       begin: Alignment.bottomCenter,
                       end: Alignment.topCenter,
                       colors: [
-                        Colors.black.withValues(alpha: 0.5),
+                        Colors.black.withValues(alpha: 0.4),
                         Colors.transparent,
                       ],
                     ),
                   ),
                 ),
               ),
-              // Favorite icon
-              if (photo.isFavorite)
+              // Caption at bottom
+              if (photo.caption != null)
                 Positioned(
-                  top: 4,
-                  right: 4,
-                  child: Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.black.withValues(alpha: 0.3),
+                  bottom: 6,
+                  left: 8,
+                  right: 8,
+                  child: Text(
+                    photo.caption!,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 9,
                     ),
-                    child: const Icon(
-                      Icons.favorite,
-                      color: Colors.red,
-                      size: 14,
-                    ),
-                  ),
-                ),
-              // Important indicator
-              if (photo.isImportant)
-                Positioned(
-                  top: 4,
-                  left: 4,
-                  child: Container(
-                    width: 6,
-                    height: 6,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFF2563EB),
-                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Color _getColorForPhoto(PhotoModel photo) {
+    final colors = [
+      const Color(0xFF3B82F6), // Blue
+      const Color(0xFF8B5CF6), // Purple
+      const Color(0xFFEC4899), // Pink
+      const Color(0xFFF97316), // Orange
+      const Color(0xFF10B981), // Green
+      const Color(0xFF06B6D4), // Cyan
+      const Color(0xFF6366F1), // Indigo
+      const Color(0xFFF43F5E), // Rose
+    ];
+    final index = int.tryParse(photo.id) ?? 0;
+    return colors[index % colors.length];
+  }
+
+  Widget _buildFloatingActionButton() {
+    return Container(
+      width: 60,
+      height: 60,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: const LinearGradient(
+          colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF2563EB).withValues(alpha: 0.4),
+            blurRadius: 16,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            // TODO: Add photo
+          },
+          customBorder: const CircleBorder(),
+          child: const Center(
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
+              size: 30,
+            ),
           ),
         ),
       ),
