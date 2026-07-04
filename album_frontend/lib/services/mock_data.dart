@@ -1,5 +1,5 @@
 import 'package:album_frontend/models/photo_model.dart';
-
+import 'package:album_frontend/models/album_model.dart';
 class MockData {
   static List<PhotoModel> getPhotos() {
     return [
@@ -198,17 +198,169 @@ class MockData {
     } else if (date.year == now.year) {
       // امسال: ماه به حروف انگلیسی، روز به عدد
       const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
       ];
       return '${months[date.month - 1]} ${date.day}';
     } else {
       // سال‌های قبل: ماه به حروف انگلیسی، روز و سال به عدد
       const months = [
-        'January', 'February', 'March', 'April', 'May', 'June',
-        'July', 'August', 'September', 'October', 'November', 'December'
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
       ];
       return '${months[date.month - 1]} ${date.day}, ${date.year}';
     }
+  }
+
+  static List<AlbumModel> getAlbums() {
+    final allPhotos = getPhotos();
+
+    return [
+      AlbumModel(
+        id: '1',
+        name: 'Nature',
+        photos: allPhotos
+            .where(
+              (p) => [
+                'Sunset Vibes',
+                'Mountain Hike',
+                'Waterfall',
+                'Park Walk',
+              ].contains(p.title),
+            )
+            .toList(),
+        createdAt: DateTime(2026, 6, 15),
+        coverColor: 'green',
+      ),
+      AlbumModel(
+        id: '2',
+        name: 'Travel',
+        photos: allPhotos
+            .where(
+              (p) => [
+                'Beach Day',
+                'Sunset Sail',
+                'Campfire',
+                'Stargazing',
+              ].contains(p.title),
+            )
+            .toList(),
+        createdAt: DateTime(2026, 6, 20),
+        coverColor: 'blue',
+      ),
+      AlbumModel(
+        id: '3',
+        name: 'Work',
+        photos: allPhotos
+            .where(
+              (p) => [
+                'Office Desk',
+                'Morning Coffee',
+                'Lunch Break',
+              ].contains(p.title),
+            )
+            .toList(),
+        createdAt: DateTime(2026, 7, 1),
+        coverColor: 'purple',
+      ),
+      AlbumModel(
+        id: '4',
+        name: 'Family',
+        photos: allPhotos
+            .where(
+              (p) => [
+                'Family Dinner',
+                'Picnic',
+                'BBQ Party',
+                'Graduation Day',
+              ].contains(p.title),
+            )
+            .toList(),
+        createdAt: DateTime(2026, 7, 2),
+        coverColor: 'orange',
+      ),
+      AlbumModel(
+        id: '5',
+        name: 'Food',
+        photos: allPhotos
+            .where(
+              (p) => [
+                'Dinner Time',
+                'Lunch Break',
+                'BBQ Party',
+                'Morning Coffee',
+              ].contains(p.title),
+            )
+            .toList(),
+        createdAt: DateTime(2026, 7, 3),
+        coverColor: 'pink',
+      ),
+      AlbumModel(
+        id: '6',
+        name: 'City',
+        photos: allPhotos
+            .where(
+              (p) => [
+                'City Lights',
+                'Concert Night',
+                'Evening Sky',
+              ].contains(p.title),
+            )
+            .toList(),
+        createdAt: DateTime(2026, 7, 4),
+        coverColor: 'cyan',
+      ),
+      AlbumModel(
+        id: '7',
+        name: 'Fitness',
+        photos: allPhotos
+            .where(
+              (p) => [
+                'Gym Session',
+                'Mountain Hike',
+                'Park Walk',
+              ].contains(p.title),
+            )
+            .toList(),
+        createdAt: DateTime(2026, 7, 4),
+        coverColor: 'red',
+      ),
+      AlbumModel(
+        id: '8',
+        name: 'Memories',
+        photos: allPhotos
+            .where(
+              (p) => [
+                'Graduation Day',
+                'Concert Night',
+                'Stargazing',
+                'Sunset Sail',
+              ].contains(p.title),
+            )
+            .toList(),
+        createdAt: DateTime(2025, 6, 15),
+        coverColor: 'indigo',
+      ),
+    ];
   }
 }
