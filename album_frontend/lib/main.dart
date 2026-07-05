@@ -79,7 +79,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      themeMode: ThemeMode.dark,
+      themeMode: ThemeMode.light,
 
       routes: {
         '/signup': (context) => const SignUpPage(),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:album_frontend/models/album_model.dart';
 import 'package:album_frontend/services/mock_data.dart';
 import 'package:album_frontend/widgets/bottom_nav_bar.dart';
+import 'package:album_frontend/screens/album_detail_page.dart';
 
 class AlbumsPage extends StatefulWidget {
   const AlbumsPage({super.key});
@@ -146,7 +147,12 @@ class _AlbumsPageState extends State<AlbumsPage> {
 
     return GestureDetector(
       onTap: () {
-        // TODO: Open album detail
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AlbumDetailPage(album: album),
+          ),
+        );
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 100),

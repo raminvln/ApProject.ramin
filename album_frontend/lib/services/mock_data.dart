@@ -381,4 +381,16 @@ class MockData {
       ),
     ];
   }
+  static Map<String, List<String>> getAlbumPhotoMap() {
+    return {
+      'Nature': ['1', '13', '14'],
+      'Travel': ['10', '11', '12', '16'],
+      'Work': ['4', '3', '5'],
+      'Family': ['19', '15', '20', '18'],
+      'Food': ['9', '5', '20', '3'],
+      'City': ['2', '17', '8'],
+      'Fitness': ['7', '13', '6'],
+      'Memories': ['19', '17', '16', '11'],
+    };
+}
 }

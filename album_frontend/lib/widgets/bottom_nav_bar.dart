@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:album_frontend/screens/home_page.dart';
 import 'package:album_frontend/screens/albums_page.dart';
+import 'package:album_frontend/screens/search_page.dart';
 
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
@@ -52,7 +53,7 @@ class BottomNavBar extends StatelessWidget {
     final isSelected = currentIndex == index;
     return GestureDetector(
       onTap: () {
-        if (index == currentIndex) return; // همین صفحه - هیچ کاری نکن
+        if (index == currentIndex) return;
 
         switch (index) {
           case 0: // Home
@@ -69,7 +70,10 @@ class BottomNavBar extends StatelessWidget {
             );
             break;
           case 2: // Search
-            // TODO
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const SearchPage()),
+            );
             break;
           case 3: // Favorites
             // TODO
