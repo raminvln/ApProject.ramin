@@ -6,6 +6,11 @@ class PhotoModel {
   final bool isFavorite;
   final bool isImportant;
   final DateTime dateAdded;
+  final String ownerName;
+  final int likes;
+  final List<String> tags;
+  final List<Map<String, String>> comments;
+  final bool isPublic;
 
   PhotoModel({
     required this.id,
@@ -15,5 +20,10 @@ class PhotoModel {
     this.isFavorite = false,
     this.isImportant = false,
     required this.dateAdded,
+    this.ownerName = 'Admin',
+    this.likes = 0,
+    this.tags = const [],
+    this.comments = const [],
+    this.isPublic = true,
   });
 }

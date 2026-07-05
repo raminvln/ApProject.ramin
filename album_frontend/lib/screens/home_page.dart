@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:album_frontend/models/photo_model.dart';
 import 'package:album_frontend/services/mock_data.dart';
-import 'package:album_frontend/screens/albums_page.dart';
+import 'package:album_frontend/widgets/bottom_nav_bar.dart';
+import 'package:album_frontend/screens/photo_detail_page.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -14,7 +16,6 @@ class _HomePageState extends State<HomePage> {
   late Map<String, List<PhotoModel>> _groupedPhotos;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -37,9 +38,7 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: Column(
           children: [
-            // Header
             _buildHeader(),
-            // Photo Grid
             Expanded(
               child: Scrollbar(
                 controller: _scrollController,
@@ -65,7 +64,7 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: _buildFloatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      bottomNavigationBar: _buildBottomNav(),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
     );
   }
 
@@ -80,10 +79,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               const Text(
                 'Photos',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
               Container(
                 width: 44,
@@ -170,7 +166,10 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(width: 10),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF2563EB).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -200,87 +199,101 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildPhotoCard(PhotoModel photo) {
+Widget _buildPhotoCard(PhotoModel photo) {
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = (screenWidth - 48) / 3;
 
     return GestureDetector(
       onTap: () {
-        // TODO: Open photo detail
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => PhotoDetailPage(photo: photo),
+          ),
+        );
       },
       child: Hero(
         tag: photo.id,
-        child: Container(
-          width: cardWidth,
-          height: cardWidth,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            color: _getColorForPhoto(photo),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 8,
-                offset: const Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Stack(
-            children: [
-              // Center text
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    photo.title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+        flightShuttleBuilder: (flightContext, animation, flightDirection, fromHeroContext, toHeroContext) {
+          return Material(
+            color: Colors.transparent,
+            child: toHeroContext.widget,
+          );
+        },
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            width: cardWidth,
+            height: cardWidth,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: _getColorForPhoto(photo),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.08),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Stack(
+              children: [
+                // Center text
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      photo.title,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              // Gradient overlay at bottom
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: Container(
-                  height: 30,
-                  decoration: BoxDecoration(
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(12),
-                      bottomRight: Radius.circular(12),
-                    ),
-                    gradient: LinearGradient(
-                      begin: Alignment.bottomCenter,
-                      end: Alignment.topCenter,
-                      colors: [
-                        Colors.black.withValues(alpha: 0.4),
-                        Colors.transparent,
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              // Caption at bottom
-              if (photo.caption != null)
+                // Gradient overlay at bottom
                 Positioned(
-                  bottom: 6,
-                  left: 8,
-                  right: 8,
-                  child: Text(
-                    photo.caption!,
-                    style: TextStyle(
-                      color: Colors.white.withValues(alpha: 0.9),
-                      fontSize: 9,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    height: 30,
+                    decoration: BoxDecoration(
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(12),
+                        bottomRight: Radius.circular(12),
+                      ),
+                      gradient: LinearGradient(
+                        begin: Alignment.bottomCenter,
+                        end: Alignment.topCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.4),
+                          Colors.transparent,
+                        ],
+                      ),
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
-            ],
+                // Caption at bottom
+                if (photo.caption != null)
+                  Positioned(
+                    bottom: 6,
+                    left: 8,
+                    right: 8,
+                    child: Text(
+                      photo.caption!,
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.9),
+                        fontSize: 9,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+              ],
+            ),
           ),
         ),
       ),
@@ -329,104 +342,8 @@ class _HomePageState extends State<HomePage> {
           },
           customBorder: const CircleBorder(),
           child: const Center(
-            child: Icon(
-              Icons.add,
-              color: Colors.white,
-              size: 30,
-            ),
+            child: Icon(Icons.add, color: Colors.white, size: 30),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNav() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(Icons.home_filled, 'Home', 0),
-              _buildNavItem(Icons.photo_album_outlined, 'Albums', 1),
-              _buildNavItem(Icons.search_outlined, 'Search', 2),
-              _buildNavItem(Icons.favorite_outline, 'Favorites', 3),
-              _buildNavItem(Icons.public_outlined, 'Explore', 4),
-              _buildNavItem(Icons.person_outline, 'Profile', 5),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    final isSelected = _currentIndex == index;
-    return GestureDetector(
-      onTap: () {
-        setState(() => _currentIndex = index);
-        // پیمایش به صفحات مختلف
-        switch (index) {
-          case 0: // Home - همین صفحه
-            break;
-          case 1: // Albums
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const AlbumsPage()),
-            );
-            break;
-          case 2: // Search
-            // TODO: Search page
-            break;
-          case 3: // Favorites
-            // TODO: Favorites page
-            break;
-          case 4: // Explore
-            // TODO: Explore page
-            break;
-          case 5: // Profile
-            // TODO: Profile page
-            break;
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF2563EB).withValues(alpha: 0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 22,
-              color: isSelected ? const Color(0xFF2563EB) : Colors.grey[500],
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                color: isSelected ? const Color(0xFF2563EB) : Colors.grey[500],
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
         ),
       ),
     );

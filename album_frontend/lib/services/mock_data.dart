@@ -1,5 +1,6 @@
 import 'package:album_frontend/models/photo_model.dart';
 import 'package:album_frontend/models/album_model.dart';
+
 class MockData {
   static List<PhotoModel> getPhotos() {
     return [
@@ -8,10 +9,27 @@ class MockData {
         id: '1',
         url: 'assets/photos/photo_1.jpg',
         title: 'Sunset Vibes',
-        caption: 'Golden hour magic',
+        caption: 'Golden hour magic over the mountains',
         isImportant: true,
         isFavorite: true,
         dateAdded: DateTime(2026, 7, 4),
+        ownerName: 'Admin',
+        likes: 42,
+        tags: ['nature', 'sunset', 'golden', 'mountains'],
+        comments: [
+          {
+            'author': 'Ali',
+            'text': 'This is absolutely stunning! 😍',
+            'time': '2 hours ago',
+          },
+          {
+            'author': 'Sara',
+            'text': 'Where was this taken?',
+            'time': '5 hours ago',
+          },
+          {'author': 'Reza', 'text': 'Perfect shot! 📸', 'time': '1 day ago'},
+        ],
+        isPublic: true,
       ),
       PhotoModel(
         id: '2',

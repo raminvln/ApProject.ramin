@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:album_frontend/models/album_model.dart';
 import 'package:album_frontend/services/mock_data.dart';
+import 'package:album_frontend/widgets/bottom_nav_bar.dart';
 
 class AlbumsPage extends StatefulWidget {
   const AlbumsPage({super.key});
@@ -13,7 +14,6 @@ class _AlbumsPageState extends State<AlbumsPage> {
   late List<AlbumModel> _albums;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  int _currentIndex = 1; // Albums selected
 
   @override
   void initState() {
@@ -67,7 +67,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
       ),
       floatingActionButton: _buildFloatingActionButton(),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      bottomNavigationBar: _buildBottomNav(),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 1),
     );
   }
 
@@ -82,10 +82,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
             children: [
               const Text(
                 'Albums',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
               Container(
                 width: 44,
@@ -177,10 +174,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [
-                          color.withValues(alpha: 0.8),
-                          color,
-                        ],
+                        colors: [color.withValues(alpha: 0.8), color],
                       ),
                     ),
                     child: Center(
@@ -299,100 +293,8 @@ class _AlbumsPageState extends State<AlbumsPage> {
           },
           customBorder: const CircleBorder(),
           child: const Center(
-            child: Icon(
-              Icons.add,
-              color: Colors.white,
-              size: 30,
-            ),
+            child: Icon(Icons.add, color: Colors.white, size: 30),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBottomNav() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      child: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavItem(Icons.home_outlined, 'Home', 0),
-              _buildNavItem(Icons.photo_album, 'Albums', 1),
-              _buildNavItem(Icons.search_outlined, 'Search', 2),
-              _buildNavItem(Icons.favorite_outline, 'Favorites', 3),
-              _buildNavItem(Icons.public_outlined, 'Explore', 4),
-              _buildNavItem(Icons.person_outline, 'Profile', 5),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildNavItem(IconData icon, String label, int index) {
-    final isSelected = _currentIndex == index;
-    return GestureDetector(
-      onTap: () {
-        setState(() => _currentIndex = index);
-        switch (index) {
-          case 0: // Home
-            Navigator.pop(context);
-            break;
-          case 1: // Albums - همین صفحه
-            break;
-          case 2: // Search
-            // TODO
-            break;
-          case 3: // Favorites
-            // TODO
-            break;
-          case 4: // Explore
-            // TODO
-            break;
-          case 5: // Profile
-            // TODO
-            break;
-        }
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF2563EB).withValues(alpha: 0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: 22,
-              color: isSelected ? const Color(0xFF2563EB) : Colors.grey[500],
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 10,
-                color: isSelected ? const Color(0xFF2563EB) : Colors.grey[500],
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-              ),
-            ),
-          ],
         ),
       ),
     );
