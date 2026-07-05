@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:album_frontend/models/photo_model.dart';
-import 'package:album_frontend/services/mock_data.dart';
-import 'package:album_frontend/widgets/bottom_nav_bar.dart';
 import 'package:album_frontend/screens/photo_detail_page.dart';
+import 'package:album_frontend/services/mock_data.dart';
+import 'package:album_frontend/services/search_service.dart';
+import 'package:album_frontend/widgets/bottom_nav_bar.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -29,6 +30,17 @@ class _HomePageState extends State<HomePage> {
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _groupedPhotos = MockData.groupByDate(_allPhotos);
+      } else {
+        final results = SearchService.searchAll(query, _allPhotos, {});
+        _groupedPhotos = MockData.groupByDate(results);
+      }
+    });
   }
 
   @override
@@ -79,7 +91,10 @@ class _HomePageState extends State<HomePage> {
             children: [
               const Text(
                 'Photos',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               Container(
                 width: 44,
@@ -105,13 +120,20 @@ class _HomePageState extends State<HomePage> {
           // Search Field
           TextField(
             controller: _searchController,
-            onChanged: (value) {
-              // TODO: Implement search
-            },
+            onChanged: _onSearchChanged,
             decoration: InputDecoration(
               hintText: 'Search photos...',
               hintStyle: TextStyle(color: Colors.grey[400]),
               prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear, size: 20),
+                      onPressed: () {
+                        _searchController.clear();
+                        _onSearchChanged('');
+                      },
+                    )
+                  : null,
               filled: true,
               fillColor: Theme.of(context).brightness == Brightness.dark
                   ? const Color(0xFF1E293B)
@@ -142,9 +164,8 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Date Header
         Padding(
-          padding: const EdgeInsets.fromLTRB(20, 28, 20, 12),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 12),
           child: Row(
             children: [
               Container(
@@ -166,10 +187,7 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(width: 10),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFF2563EB).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -186,7 +204,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
         ),
-        // Photo Grid
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16),
           child: Wrap(
@@ -199,7 +216,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-Widget _buildPhotoCard(PhotoModel photo) {
+  Widget _buildPhotoCard(PhotoModel photo) {
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = (screenWidth - 48) / 3;
 
@@ -214,7 +231,8 @@ Widget _buildPhotoCard(PhotoModel photo) {
       },
       child: Hero(
         tag: photo.id,
-        flightShuttleBuilder: (flightContext, animation, flightDirection, fromHeroContext, toHeroContext) {
+        flightShuttleBuilder: (flightContext, animation, flightDirection,
+            fromHeroContext, toHeroContext) {
           return Material(
             color: Colors.transparent,
             child: toHeroContext.widget,
@@ -238,7 +256,6 @@ Widget _buildPhotoCard(PhotoModel photo) {
             ),
             child: Stack(
               children: [
-                // Center text
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
@@ -253,7 +270,6 @@ Widget _buildPhotoCard(PhotoModel photo) {
                     ),
                   ),
                 ),
-                // Gradient overlay at bottom
                 Positioned(
                   bottom: 0,
                   left: 0,
@@ -276,7 +292,6 @@ Widget _buildPhotoCard(PhotoModel photo) {
                     ),
                   ),
                 ),
-                // Caption at bottom
                 if (photo.caption != null)
                   Positioned(
                     bottom: 6,
@@ -302,14 +317,14 @@ Widget _buildPhotoCard(PhotoModel photo) {
 
   Color _getColorForPhoto(PhotoModel photo) {
     final colors = [
-      const Color(0xFF3B82F6), // Blue
-      const Color(0xFF8B5CF6), // Purple
-      const Color(0xFFEC4899), // Pink
-      const Color(0xFFF97316), // Orange
-      const Color(0xFF10B981), // Green
-      const Color(0xFF06B6D4), // Cyan
-      const Color(0xFF6366F1), // Indigo
-      const Color(0xFFF43F5E), // Rose
+      const Color(0xFF3B82F6),
+      const Color(0xFF8B5CF6),
+      const Color(0xFFEC4899),
+      const Color(0xFFF97316),
+      const Color(0xFF10B981),
+      const Color(0xFF06B6D4),
+      const Color(0xFF6366F1),
+      const Color(0xFFF43F5E),
     ];
     final index = int.tryParse(photo.id) ?? 0;
     return colors[index % colors.length];
@@ -337,9 +352,7 @@ Widget _buildPhotoCard(PhotoModel photo) {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            // TODO: Add photo
-          },
+          onTap: () {},
           customBorder: const CircleBorder(),
           child: const Center(
             child: Icon(Icons.add, color: Colors.white, size: 30),

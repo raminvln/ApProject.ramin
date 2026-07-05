@@ -20,7 +20,7 @@ class _SearchPageState extends State<SearchPage> {
   List<PhotoModel> _allPhotos = [];
   List<PhotoModel> _searchResults = [];
   Map<String, List<String>> _albumPhotoMap = {};
-  String _selectedFilter = 'All';
+  String _selectedFilter = 'Name';
   DateTime? _selectedDate;
   bool _isSearching = false;
 
@@ -64,18 +64,14 @@ class _SearchPageState extends State<SearchPage> {
           _searchResults = SearchService.searchByTag(query, _allPhotos);
           break;
         case 'Album':
-          _searchResults =
-              SearchService.searchByAlbum(query, _allPhotos, _albumPhotoMap);
+          _searchResults = SearchService.searchByAlbum(
+              query, _allPhotos, _albumPhotoMap);
           break;
         case 'Comment':
           _searchResults = SearchService.searchByComment(query, _allPhotos);
           break;
-        default: // All
-          _searchResults =
-              SearchService.searchAll(query, _allPhotos, _albumPhotoMap);
       }
 
-      // فقط وقتی saveToHistory باشه ذخیره کن
       if (saveToHistory &&
           query.isNotEmpty &&
           !_recentSearches.contains(query)) {
@@ -112,7 +108,6 @@ class _SearchPageState extends State<SearchPage> {
         _searchResults = SearchService.searchByDate(date, _allPhotos);
         _searchController.text = _formatDate(date);
 
-        // ذخیره در تاریخچه
         final dateString = _formatDate(date);
         if (!_recentSearches.contains(dateString)) {
           _recentSearches.insert(0, dateString);
@@ -162,7 +157,6 @@ class _SearchPageState extends State<SearchPage> {
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
       child: Column(
         children: [
-          // Title
           Row(
             children: [
               Text(
@@ -197,7 +191,6 @@ class _SearchPageState extends State<SearchPage> {
             ],
           ),
           const SizedBox(height: 16),
-          // Search Field
           TextField(
             controller: _searchController,
             focusNode: _searchFocusNode,
@@ -253,12 +246,11 @@ class _SearchPageState extends State<SearchPage> {
             ),
           ),
           const SizedBox(height: 16),
-          // Filter Chips
+          // Filter Chips (بدون All)
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
               children: [
-                _buildFilterChip('All', isDark),
                 _buildFilterChip('Name', isDark),
                 _buildFilterChip('Tag', isDark),
                 _buildFilterChip('Album', isDark),
@@ -324,7 +316,6 @@ class _SearchPageState extends State<SearchPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Recent Searches
           if (_recentSearches.isNotEmpty) ...[
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -370,7 +361,6 @@ class _SearchPageState extends State<SearchPage> {
                 )),
             const SizedBox(height: 28),
           ],
-          // Trending Tags
           Text(
             'Trending Tags',
             style: TextStyle(

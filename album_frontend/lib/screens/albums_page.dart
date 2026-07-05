@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:album_frontend/models/album_model.dart';
+import 'package:album_frontend/screens/album_detail_page.dart';
 import 'package:album_frontend/services/mock_data.dart';
 import 'package:album_frontend/widgets/bottom_nav_bar.dart';
-import 'package:album_frontend/screens/album_detail_page.dart';
 
 class AlbumsPage extends StatefulWidget {
   const AlbumsPage({super.key});
@@ -12,16 +12,17 @@ class AlbumsPage extends StatefulWidget {
 }
 
 class _AlbumsPageState extends State<AlbumsPage> {
-  late List<AlbumModel> _albums;
+  late List<AlbumModel> _allAlbums;
+  late List<AlbumModel> _filteredAlbums = [];
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
-    _albums = MockData.getAlbums();
-    // مرتب‌سازی بر اساس جدیدترین
-    _albums.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    _allAlbums = MockData.getAlbums();
+    _allAlbums.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    _filteredAlbums = List.from(_allAlbums);
   }
 
   @override
@@ -29,6 +30,20 @@ class _AlbumsPageState extends State<AlbumsPage> {
     _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredAlbums = _allAlbums;
+      } else {
+        _filteredAlbums = _allAlbums
+            .where(
+              (album) => album.name.toLowerCase().contains(query.toLowerCase()),
+            )
+            .toList();
+      }
+    });
   }
 
   @override
@@ -56,9 +71,9 @@ class _AlbumsPageState extends State<AlbumsPage> {
                     mainAxisSpacing: 12,
                     childAspectRatio: 0.78,
                   ),
-                  itemCount: _albums.length,
+                  itemCount: _filteredAlbums.length,
                   itemBuilder: (context, index) {
-                    return _buildAlbumCard(_albums[index]);
+                    return _buildAlbumCard(_filteredAlbums[index]);
                   },
                 ),
               ),
@@ -109,13 +124,20 @@ class _AlbumsPageState extends State<AlbumsPage> {
           // Search Field
           TextField(
             controller: _searchController,
-            onChanged: (value) {
-              // TODO: Implement search
-            },
+            onChanged: _onSearchChanged,
             decoration: InputDecoration(
               hintText: 'Search albums...',
               hintStyle: TextStyle(color: Colors.grey[400]),
               prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear, size: 20),
+                      onPressed: () {
+                        _searchController.clear();
+                        _onSearchChanged('');
+                      },
+                    )
+                  : null,
               filled: true,
               fillColor: Theme.of(context).brightness == Brightness.dark
                   ? const Color(0xFF1E293B)
@@ -154,96 +176,90 @@ class _AlbumsPageState extends State<AlbumsPage> {
           ),
         );
       },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 100),
-        transform: Matrix4.identity()..scale(1.0),
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
-            color: color,
-            boxShadow: [
-              BoxShadow(
-                color: color.withValues(alpha: 0.3),
-                blurRadius: 12,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Stack(
-            children: [
-              // Cover with gradient
-              Positioned.fill(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(16),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [color.withValues(alpha: 0.8), color],
-                      ),
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(16),
+          color: color,
+          boxShadow: [
+            BoxShadow(
+              color: color.withValues(alpha: 0.3),
+              blurRadius: 12,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [color.withValues(alpha: 0.8), color],
                     ),
-                    child: Center(
-                      child: Icon(
-                        Icons.photo_album_outlined,
-                        size: 56,
-                        color: Colors.white.withValues(alpha: 0.3),
-                      ),
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.photo_album_outlined,
+                      size: 56,
+                      color: Colors.white.withValues(alpha: 0.3),
                     ),
                   ),
                 ),
               ),
-              // Glass Bottom Bar
-              Positioned(
-                bottom: 0,
-                left: 0,
-                right: 0,
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(16),
-                    bottomRight: Radius.circular(16),
-                  ),
-                  child: Container(
-                    padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.bottomCenter,
-                        end: Alignment.topCenter,
-                        colors: [
-                          Colors.black.withValues(alpha: 0.7),
-                          Colors.black.withValues(alpha: 0.3),
-                          Colors.transparent,
-                        ],
-                      ),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          album.name,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          '${album.photoCount} photos',
-                          style: TextStyle(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: ClipRRect(
+                borderRadius: const BorderRadius.only(
+                  bottomLeft: Radius.circular(16),
+                  bottomRight: Radius.circular(16),
+                ),
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.bottomCenter,
+                      end: Alignment.topCenter,
+                      colors: [
+                        Colors.black.withValues(alpha: 0.7),
+                        Colors.black.withValues(alpha: 0.3),
+                        Colors.transparent,
                       ],
                     ),
                   ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        album.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${album.photoCount} photos',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
@@ -294,9 +310,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            // TODO: Create album
-          },
+          onTap: () {},
           customBorder: const CircleBorder(),
           child: const Center(
             child: Icon(Icons.add, color: Colors.white, size: 30),
