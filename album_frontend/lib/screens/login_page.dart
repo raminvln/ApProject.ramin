@@ -44,6 +44,86 @@ class _LoginPageState extends State<LoginPage>
     super.dispose();
   }
 
+  bool _isValidUserName(String userName) {
+    final emailPattern = RegExp(r'^[A-Za-z0-9+_.-]+@(.+)$');
+    final phonePattern = RegExp(r'^0[0-9]{10}$');
+    return emailPattern.hasMatch(userName) || phonePattern.hasMatch(userName);
+  }
+
+  bool _isValidPassword(String password, String userName) {
+    if (password.length < 8) {
+      _showError('Password must be at least 8 characters');
+      return false;
+    }
+    if (!password.contains(RegExp(r'[A-Z]'))) {
+      _showError('Password must contain at least one uppercase letter');
+      return false;
+    }
+    if (!password.contains(RegExp(r'[a-z]'))) {
+      _showError('Password must contain at least one lowercase letter');
+      return false;
+    }
+    if (!password.contains(RegExp(r'[0-9]'))) {
+      _showError('Password must contain at least one digit');
+      return false;
+    }
+    if (password.toLowerCase().contains(userName.toLowerCase().split('@')[0]) &&
+        userName.contains('@')) {
+      _showError('Password cannot contain your username');
+      return false;
+    }
+    return true;
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white, size: 20),
+            const SizedBox(width: 10),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _login() {
+    String userName = _usernameController.text.trim();
+    String password = _passwordController.text;
+
+    // چک خالی بودن
+    if (userName.isEmpty || password.isEmpty) {
+      _showError('Please fill all fields');
+      return;
+    }
+
+    // چک فرمت userName
+    if (!_isValidUserName(userName)) {
+      _showError('Invalid email or phone format');
+      return;
+    }
+
+    // چک فرمت password
+    if (!_isValidPassword(password, userName)) {
+      return;
+    }
+
+    // چک لاگین
+    if (userName == 'admin@mail.com' && password == 'Test1234') {
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      _showError('Invalid email or password');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +139,6 @@ class _LoginPageState extends State<LoginPage>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(height: 60),
-                    // Logo
                     Container(
                       width: 100,
                       height: 100,
@@ -70,7 +149,8 @@ class _LoginPageState extends State<LoginPage>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                            color: const Color(0xFF2563EB)
+                                .withValues(alpha: 0.3),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -99,9 +179,8 @@ class _LoginPageState extends State<LoginPage>
                       ),
                     ),
                     const SizedBox(height: 48),
-                    // Welcome Text
                     Align(
-                      alignment: Alignment.center,
+                      alignment: Alignment.centerLeft,
                       child: Text(
                         'Welcome Back',
                         style: TextStyle(
@@ -112,16 +191,15 @@ class _LoginPageState extends State<LoginPage>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Username Field
                     TextField(
                       controller: _usernameController,
+                      keyboardType: TextInputType.emailAddress,
                       decoration: const InputDecoration(
                         hintText: 'Username',
                         prefixIcon: Icon(Icons.person_outline),
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Password Field
                     TextField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
@@ -143,7 +221,6 @@ class _LoginPageState extends State<LoginPage>
                       ),
                     ),
                     const SizedBox(height: 32),
-                    // Sign In Button
                     GestureDetector(
                       onTapDown: (_) => _onTapDown(),
                       onTapUp: (_) => _onTapUp(),
@@ -161,7 +238,8 @@ class _LoginPageState extends State<LoginPage>
                             borderRadius: BorderRadius.circular(18),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF2563EB).withValues(alpha: 0.4),
+                                color: const Color(0xFF2563EB)
+                                    .withValues(alpha: 0.4),
                                 blurRadius: 15,
                                 offset: const Offset(0, 6),
                               ),
@@ -181,7 +259,6 @@ class _LoginPageState extends State<LoginPage>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Create Account Link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -222,29 +299,5 @@ class _LoginPageState extends State<LoginPage>
 
   void _onTapUp() {
     setState(() => _buttonScale = 1.0);
-  }
-
-  void _login() {
-    String username = _usernameController.text;
-    String password = _passwordController.text;
-
-    if (username == 'admin' && password == 'Admin123') {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('Error'),
-          content: const Text('Invalid username or password'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
   }
 }

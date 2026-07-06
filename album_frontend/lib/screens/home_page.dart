@@ -4,6 +4,7 @@ import 'package:album_frontend/screens/photo_detail_page.dart';
 import 'package:album_frontend/services/mock_data.dart';
 import 'package:album_frontend/services/search_service.dart';
 import 'package:album_frontend/widgets/bottom_nav_bar.dart';
+import 'package:album_frontend/screens/upload_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -91,10 +92,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               const Text(
                 'Photos',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
               Container(
                 width: 44,
@@ -187,7 +185,10 @@ class _HomePageState extends State<HomePage> {
               ),
               const SizedBox(width: 10),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: const Color(0xFF2563EB).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
@@ -231,13 +232,19 @@ class _HomePageState extends State<HomePage> {
       },
       child: Hero(
         tag: photo.id,
-        flightShuttleBuilder: (flightContext, animation, flightDirection,
-            fromHeroContext, toHeroContext) {
-          return Material(
-            color: Colors.transparent,
-            child: toHeroContext.widget,
-          );
-        },
+        flightShuttleBuilder:
+            (
+              flightContext,
+              animation,
+              flightDirection,
+              fromHeroContext,
+              toHeroContext,
+            ) {
+              return Material(
+                color: Colors.transparent,
+                child: toHeroContext.widget,
+              );
+            },
         child: Material(
           color: Colors.transparent,
           child: Container(
@@ -352,7 +359,12 @@ class _HomePageState extends State<HomePage> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UploadPage()),
+            );
+          },
           customBorder: const CircleBorder(),
           child: const Center(
             child: Icon(Icons.add, color: Colors.white, size: 30),

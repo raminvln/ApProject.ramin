@@ -46,6 +46,83 @@ class _SignUpPageState extends State<SignUpPage>
     super.dispose();
   }
 
+  bool _isValidUserName(String userName) {
+    final emailPattern = RegExp(r'^[A-Za-z0-9+_.-]+@(.+)$');
+    final phonePattern = RegExp(r'^0[0-9]{10}$');
+    return emailPattern.hasMatch(userName) || phonePattern.hasMatch(userName);
+  }
+
+  bool _isValidPassword(String password, String userName) {
+    if (password.length < 8) {
+      _showError('Password must be at least 8 characters');
+      return false;
+    }
+    if (!password.contains(RegExp(r'[A-Z]'))) {
+      _showError('Password must contain at least one uppercase letter');
+      return false;
+    }
+    if (!password.contains(RegExp(r'[a-z]'))) {
+      _showError('Password must contain at least one lowercase letter');
+      return false;
+    }
+    if (!password.contains(RegExp(r'[0-9]'))) {
+      _showError('Password must contain at least one digit');
+      return false;
+    }
+    if (password.toLowerCase().contains(userName.toLowerCase().split('@')[0]) &&
+        userName.contains('@')) {
+      _showError('Password cannot contain your username');
+      return false;
+    }
+    return true;
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error_outline, color: Colors.white, size: 20),
+            const SizedBox(width: 10),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+        duration: const Duration(seconds: 3),
+      ),
+    );
+  }
+
+  void _signUp() {
+    String displayName = _displayNameController.text.trim();
+    String userName = _userNameController.text.trim();
+    String password = _passwordController.text;
+
+    // چک خالی بودن
+    if (displayName.isEmpty || userName.isEmpty || password.isEmpty) {
+      _showError('Please fill all fields');
+      return;
+    }
+
+    // چک فرمت userName
+    if (!_isValidUserName(userName)) {
+      _showError('Invalid email or phone format');
+      return;
+    }
+
+    // چک فرمت password
+    if (!_isValidPassword(password, userName)) {
+      return;
+    }
+
+    // TODO: ذخیره کاربر و رفتن به صفحه اصلی
+    Navigator.pushReplacementNamed(context, '/home');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +138,6 @@ class _SignUpPageState extends State<SignUpPage>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(height: 40),
-                    // Logo
                     Container(
                       width: 100,
                       height: 100,
@@ -72,7 +148,8 @@ class _SignUpPageState extends State<SignUpPage>
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color(0xFF2563EB).withValues(alpha: 0.3),
+                            color: const Color(0xFF2563EB)
+                                .withValues(alpha: 0.3),
                             blurRadius: 20,
                             offset: const Offset(0, 8),
                           ),
@@ -101,7 +178,6 @@ class _SignUpPageState extends State<SignUpPage>
                       ),
                     ),
                     const SizedBox(height: 40),
-                    // Create Account Text
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -114,7 +190,6 @@ class _SignUpPageState extends State<SignUpPage>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Full Name Field
                     TextField(
                       controller: _displayNameController,
                       decoration: const InputDecoration(
@@ -123,7 +198,6 @@ class _SignUpPageState extends State<SignUpPage>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Email/Phone Field
                     TextField(
                       controller: _userNameController,
                       keyboardType: TextInputType.emailAddress,
@@ -133,7 +207,6 @@ class _SignUpPageState extends State<SignUpPage>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Password Field
                     TextField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
@@ -155,7 +228,6 @@ class _SignUpPageState extends State<SignUpPage>
                       ),
                     ),
                     const SizedBox(height: 32),
-                    // Create Account Button
                     GestureDetector(
                       onTapDown: (_) => _onTapDown(),
                       onTapUp: (_) => _onTapUp(),
@@ -173,7 +245,8 @@ class _SignUpPageState extends State<SignUpPage>
                             borderRadius: BorderRadius.circular(18),
                             boxShadow: [
                               BoxShadow(
-                                color: const Color(0xFF2563EB).withValues(alpha: 0.4),
+                                color: const Color(0xFF2563EB)
+                                    .withValues(alpha: 0.4),
                                 blurRadius: 15,
                                 offset: const Offset(0, 6),
                               ),
@@ -193,7 +266,6 @@ class _SignUpPageState extends State<SignUpPage>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Sign In Link
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -234,36 +306,5 @@ class _SignUpPageState extends State<SignUpPage>
 
   void _onTapUp() {
     setState(() => _buttonScale = 1.0);
-  }
-
-  void _signUp() {
-    String displayName = _displayNameController.text.trim();
-    String userName = _userNameController.text.trim();
-    String password = _passwordController.text.trim();
-
-    if (displayName.isEmpty || userName.isEmpty || password.isEmpty) {
-      _showError('Please fill all fields');
-      return;
-    }
-
-    // TODO: ذخیره کاربر و رفتن به صفحه اصلی
-    Navigator.pushReplacementNamed(context, '/home');
-  }
-
-  void _showError(String message) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Error'),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
   }
 }

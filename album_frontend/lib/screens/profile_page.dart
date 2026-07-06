@@ -20,7 +20,7 @@ class _ProfilePageState extends State<ProfilePage> {
     super.initState();
     _user = UserModel(
       userName: 'admin@mail.com',
-      password: 'Admin123',
+      password: 'Test1234',
       displayName: 'Ali Rezaei',
       photoCount: 20,
       albumCount: 8,
@@ -64,6 +64,26 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  bool _isValidPassword(String password, String userName) {
+    if (password.length < 8) {
+      return false;
+    }
+    if (!password.contains(RegExp(r'[A-Z]'))) {
+      return false;
+    }
+    if (!password.contains(RegExp(r'[a-z]'))) {
+      return false;
+    }
+    if (!password.contains(RegExp(r'[0-9]'))) {
+      return false;
+    }
+    if (password.toLowerCase().contains(userName.toLowerCase().split('@')[0]) &&
+        userName.contains('@')) {
+      return false;
+    }
+    return true;
+  }
+
   void _showChangePasswordDialog() {
     final currentPasswordController = TextEditingController();
     final newPasswordController = TextEditingController();
@@ -84,7 +104,7 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Error message (always visible)
+                // Error message
                 if (errorText != null) ...[
                   Container(
                     width: double.infinity,
@@ -194,7 +214,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
           ),
           actions: [
-            // Cancel button
             SizedBox(
               width: 120,
               child: OutlinedButton(
@@ -209,7 +228,6 @@ class _ProfilePageState extends State<ProfilePage> {
               ),
             ),
             const SizedBox(width: 8),
-            // Save button
             SizedBox(
               width: 120,
               child: ElevatedButton(
@@ -226,11 +244,49 @@ class _ProfilePageState extends State<ProfilePage> {
                         () => errorText = 'Please enter a new password');
                     return;
                   }
-                  // چک پسورد جدید
+                  // چک تکراری نبودن
+                  if (newPasswordController.text == _user.password) {
+                    setDialogState(() =>
+                        errorText =
+                            'New password must be different from current password');
+                    return;
+                  }
+                  // چک فرمت پسورد جدید
                   if (newPasswordController.text.length < 8) {
                     setDialogState(() =>
                         errorText =
                             'Password must be at least 8 characters');
+                    return;
+                  }
+                  if (!newPasswordController.text
+                      .contains(RegExp(r'[A-Z]'))) {
+                    setDialogState(() =>
+                        errorText =
+                            'Password must contain at least one uppercase letter');
+                    return;
+                  }
+                  if (!newPasswordController.text
+                      .contains(RegExp(r'[a-z]'))) {
+                    setDialogState(() =>
+                        errorText =
+                            'Password must contain at least one lowercase letter');
+                    return;
+                  }
+                  if (!newPasswordController.text
+                      .contains(RegExp(r'[0-9]'))) {
+                    setDialogState(() =>
+                        errorText =
+                            'Password must contain at least one digit');
+                    return;
+                  }
+                  if (newPasswordController.text
+                          .toLowerCase()
+                          .contains(_user.userName
+                              .toLowerCase()
+                              .split('@')[0]) &&
+                      _user.userName.contains('@')) {
+                    setDialogState(() =>
+                        errorText = 'Password cannot contain your username');
                     return;
                   }
                   // چک تطابق
@@ -338,7 +394,6 @@ class _ProfilePageState extends State<ProfilePage> {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                // Avatar
                 Container(
                   width: 100,
                   height: 100,
@@ -385,7 +440,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
                 const SizedBox(height: 28),
-                // Stats Card
                 Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
