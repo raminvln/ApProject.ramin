@@ -13,7 +13,8 @@ class _SignUpPageState extends State<SignUpPage>
   late Animation<double> _fadeAnimation;
   late Animation<Offset> _slideAnimation;
 
-  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _displayNameController = TextEditingController();
+  final TextEditingController _userNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
@@ -38,7 +39,8 @@ class _SignUpPageState extends State<SignUpPage>
 
   @override
   void dispose() {
-    _usernameController.dispose();
+    _displayNameController.dispose();
+    _userNameController.dispose();
     _passwordController.dispose();
     _animationController.dispose();
     super.dispose();
@@ -58,7 +60,7 @@ class _SignUpPageState extends State<SignUpPage>
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 60),
+                    const SizedBox(height: 40),
                     // Logo
                     Container(
                       width: 100,
@@ -98,10 +100,10 @@ class _SignUpPageState extends State<SignUpPage>
                         color: Colors.grey[500],
                       ),
                     ),
-                    const SizedBox(height: 48),
+                    const SizedBox(height: 40),
                     // Create Account Text
                     Align(
-                      alignment: Alignment.center,
+                      alignment: Alignment.centerLeft,
                       child: Text(
                         'Create Account',
                         style: TextStyle(
@@ -112,12 +114,22 @@ class _SignUpPageState extends State<SignUpPage>
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Username Field
+                    // Full Name Field
                     TextField(
-                      controller: _usernameController,
+                      controller: _displayNameController,
                       decoration: const InputDecoration(
-                        hintText: 'Username',
-                        prefixIcon: Icon(Icons.person_outline),
+                        hintText: 'Full Name',
+                        prefixIcon: Icon(Icons.badge_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Email/Phone Field
+                    TextField(
+                      controller: _userNameController,
+                      keyboardType: TextInputType.emailAddress,
+                      decoration: const InputDecoration(
+                        hintText: 'Email or Phone',
+                        prefixIcon: Icon(Icons.email_outlined),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -225,6 +237,33 @@ class _SignUpPageState extends State<SignUpPage>
   }
 
   void _signUp() {
-    // TODO: پیاده‌سازی ثبت‌نام
+    String displayName = _displayNameController.text.trim();
+    String userName = _userNameController.text.trim();
+    String password = _passwordController.text.trim();
+
+    if (displayName.isEmpty || userName.isEmpty || password.isEmpty) {
+      _showError('Please fill all fields');
+      return;
+    }
+
+    // TODO: ذخیره کاربر و رفتن به صفحه اصلی
+    Navigator.pushReplacementNamed(context, '/home');
+  }
+
+  void _showError(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Error'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 }

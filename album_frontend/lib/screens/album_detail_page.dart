@@ -3,6 +3,7 @@ import 'package:album_frontend/models/album_model.dart';
 import 'package:album_frontend/models/photo_model.dart';
 import 'package:album_frontend/screens/photo_detail_page.dart';
 import 'package:album_frontend/services/mock_data.dart';
+import 'package:album_frontend/services/search_service.dart';
 
 class AlbumDetailPage extends StatefulWidget {
   final AlbumModel album;
@@ -20,11 +21,13 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   late Map<String, List<PhotoModel>> _groupedPhotos;
+  late List<PhotoModel> _allFilteredPhotos;
   String _selectedFilter = 'All';
 
   @override
   void initState() {
     super.initState();
+    _allFilteredPhotos = List.from(widget.album.photos);
     _applyFilter('All');
   }
 
@@ -35,6 +38,18 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
     super.dispose();
   }
 
+  void _onSearchChanged(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _allFilteredPhotos = List.from(widget.album.photos);
+      } else {
+        _allFilteredPhotos =
+            SearchService.searchAll(query, widget.album.photos, {});
+      }
+      _applyFilter(_selectedFilter);
+    });
+  }
+
   void _applyFilter(String filter) {
     List<PhotoModel> filteredPhotos;
     final now = DateTime.now();
@@ -42,18 +57,18 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
     switch (filter) {
       case 'This Week':
         final weekAgo = now.subtract(const Duration(days: 7));
-        filteredPhotos = widget.album.photos
+        filteredPhotos = _allFilteredPhotos
             .where((p) => p.dateAdded.isAfter(weekAgo))
             .toList();
         break;
       case 'This Month':
         final monthAgo = now.subtract(const Duration(days: 30));
-        filteredPhotos = widget.album.photos
+        filteredPhotos = _allFilteredPhotos
             .where((p) => p.dateAdded.isAfter(monthAgo))
             .toList();
         break;
       default: // All
-        filteredPhotos = widget.album.photos;
+        filteredPhotos = _allFilteredPhotos;
     }
 
     setState(() {
@@ -257,10 +272,20 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
           // Search Field
           TextField(
             controller: _searchController,
+            onChanged: _onSearchChanged,
             decoration: InputDecoration(
               hintText: 'Search in album...',
               hintStyle: TextStyle(color: Colors.grey[400]),
               prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+              suffixIcon: _searchController.text.isNotEmpty
+                  ? IconButton(
+                      icon: const Icon(Icons.clear, size: 20),
+                      onPressed: () {
+                        _searchController.clear();
+                        _onSearchChanged('');
+                      },
+                    )
+                  : null,
               filled: true,
               fillColor:
                   isDark ? const Color(0xFF1E293B) : const Color(0xFFF1F5F9),
@@ -529,9 +554,7 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {
-            // TODO: Add photo to album
-          },
+          onTap: () {},
           customBorder: const CircleBorder(),
           child: const Center(
             child: Icon(Icons.add, color: Colors.white, size: 30),
