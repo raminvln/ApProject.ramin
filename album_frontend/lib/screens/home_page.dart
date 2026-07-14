@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:album_frontend/models/photo_model.dart';
 import 'package:album_frontend/screens/photo_detail_page.dart';
+import 'package:album_frontend/screens/upload_page.dart';
 import 'package:album_frontend/services/mock_data.dart';
 import 'package:album_frontend/services/search_service.dart';
 import 'package:album_frontend/widgets/bottom_nav_bar.dart';
-import 'package:album_frontend/screens/upload_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -18,12 +18,13 @@ class _HomePageState extends State<HomePage> {
   late Map<String, List<PhotoModel>> _groupedPhotos;
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
+  String _sortBy = 'Latest';
 
   @override
   void initState() {
     super.initState();
     _allPhotos = MockData.getPhotos();
-    _groupedPhotos = MockData.groupByDate(_allPhotos);
+    _sortPhotos('Latest');
   }
 
   @override
@@ -36,11 +37,31 @@ class _HomePageState extends State<HomePage> {
   void _onSearchChanged(String query) {
     setState(() {
       if (query.isEmpty) {
-        _groupedPhotos = MockData.groupByDate(_allPhotos);
+        _allPhotos = MockData.getPhotos();
       } else {
-        final results = SearchService.searchAll(query, _allPhotos, {});
-        _groupedPhotos = MockData.groupByDate(results);
+        _allPhotos = SearchService.searchAll(query, MockData.getPhotos(), {});
       }
+      _sortPhotos(_sortBy);
+    });
+  }
+
+  void _sortPhotos(String sortBy) {
+    setState(() {
+      _sortBy = sortBy;
+      List<PhotoModel> photos = List.from(_allPhotos);
+
+      switch (sortBy) {
+        case 'A-Z':
+          photos.sort((a, b) => a.title.compareTo(b.title));
+          break;
+        case 'Most Liked':
+          photos.sort((a, b) => b.likes.compareTo(a.likes));
+          break;
+        default: // Latest
+          photos.sort((a, b) => b.dateAdded.compareTo(a.dateAdded));
+      }
+
+      _groupedPhotos = MockData.groupByDate(photos);
     });
   }
 
@@ -90,10 +111,8 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Photos',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-              ),
+              const Text('Photos',
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold)),
               Container(
                 width: 44,
                 height: 44,
@@ -104,10 +123,9 @@ class _HomePageState extends State<HomePage> {
                       : Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2)),
                   ],
                 ),
                 child: const Icon(Icons.settings_outlined, size: 22),
@@ -115,7 +133,6 @@ class _HomePageState extends State<HomePage> {
             ],
           ),
           const SizedBox(height: 16),
-          // Search Field
           TextField(
             controller: _searchController,
             onChanged: _onSearchChanged,
@@ -137,23 +154,87 @@ class _HomePageState extends State<HomePage> {
                   ? const Color(0xFF1E293B)
                   : const Color(0xFFF1F5F9),
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
-              ),
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
-              ),
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(
-                  color: const Color(0xFF2563EB).withValues(alpha: 0.5),
-                ),
+                    color:
+                        const Color(0xFF2563EB).withValues(alpha: 0.5)),
               ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 14),
+              contentPadding:
+                  const EdgeInsets.symmetric(vertical: 14),
+            ),
+          ),
+          const SizedBox(height: 12),
+          // Sort Chips
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                _buildSortChip('Latest'),
+                _buildSortChip('A-Z'),
+                _buildSortChip('Most Liked'),
+              ],
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSortChip(String label) {
+    final isSelected = _sortBy == label;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: GestureDetector(
+        onTap: () => _sortPhotos(label),
+        child: Container(
+          padding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          decoration: BoxDecoration(
+            color: isSelected
+                ? const Color(0xFF2563EB).withValues(alpha: 0.1)
+                : Theme.of(context).brightness == Brightness.dark
+                    ? const Color(0xFF1E293B)
+                    : const Color(0xFFF1F5F9),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color:
+                  isSelected ? const Color(0xFF2563EB) : Colors.transparent,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                label == 'Latest'
+                    ? Icons.access_time
+                    : label == 'A-Z'
+                        ? Icons.sort_by_alpha
+                        : Icons.favorite,
+                size: 14,
+                color: isSelected
+                    ? const Color(0xFF2563EB)
+                    : Colors.grey[500],
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  color: isSelected
+                      ? const Color(0xFF2563EB)
+                      : Colors.grey[500],
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -175,32 +256,25 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               const SizedBox(width: 12),
-              Text(
-                dateLabel,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                  color: Theme.of(context).textTheme.bodyLarge?.color,
-                ),
-              ),
+              Text(dateLabel,
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w700,
+                      color:
+                          Theme.of(context).textTheme.bodyLarge?.color)),
               const SizedBox(width: 10),
               Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFF2563EB).withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Text(
-                  '${photos.length}',
-                  style: const TextStyle(
-                    color: Color(0xFF2563EB),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
+                child: Text('${photos.length}',
+                    style: const TextStyle(
+                        color: Color(0xFF2563EB),
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600)),
               ),
             ],
           ),
@@ -210,7 +284,8 @@ class _HomePageState extends State<HomePage> {
           child: Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: photos.map((photo) => _buildPhotoCard(photo)).toList(),
+            children:
+                photos.map((photo) => _buildPhotoCard(photo)).toList(),
           ),
         ),
       ],
@@ -232,19 +307,11 @@ class _HomePageState extends State<HomePage> {
       },
       child: Hero(
         tag: photo.id,
-        flightShuttleBuilder:
-            (
-              flightContext,
-              animation,
-              flightDirection,
-              fromHeroContext,
-              toHeroContext,
-            ) {
-              return Material(
-                color: Colors.transparent,
-                child: toHeroContext.widget,
-              );
-            },
+        flightShuttleBuilder: (flightContext, animation, flightDirection,
+            fromHeroContext, toHeroContext) {
+          return Material(
+              color: Colors.transparent, child: toHeroContext.widget);
+        },
         child: Material(
           color: Colors.transparent,
           child: Container(
@@ -255,10 +322,9 @@ class _HomePageState extends State<HomePage> {
               color: _getColorForPhoto(photo),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.08),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
+                    color: Colors.black.withValues(alpha: 0.08),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2)),
               ],
             ),
             child: Stack(
@@ -266,15 +332,12 @@ class _HomePageState extends State<HomePage> {
                 Center(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      photo.title,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: Text(photo.title,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600)),
                   ),
                 ),
                 Positioned(
@@ -285,9 +348,8 @@ class _HomePageState extends State<HomePage> {
                     height: 30,
                     decoration: BoxDecoration(
                       borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(12),
-                        bottomRight: Radius.circular(12),
-                      ),
+                          bottomLeft: Radius.circular(12),
+                          bottomRight: Radius.circular(12)),
                       gradient: LinearGradient(
                         begin: Alignment.bottomCenter,
                         end: Alignment.topCenter,
@@ -304,15 +366,12 @@ class _HomePageState extends State<HomePage> {
                     bottom: 6,
                     left: 8,
                     right: 8,
-                    child: Text(
-                      photo.caption!,
-                      style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.9),
-                        fontSize: 9,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+                    child: Text(photo.caption!,
+                        style: TextStyle(
+                            color: Colors.white.withValues(alpha: 0.9),
+                            fontSize: 9),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
                   ),
               ],
             ),
@@ -323,15 +382,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   Color _getColorForPhoto(PhotoModel photo) {
-    final colors = [
-      const Color(0xFF3B82F6),
-      const Color(0xFF8B5CF6),
-      const Color(0xFFEC4899),
-      const Color(0xFFF97316),
-      const Color(0xFF10B981),
-      const Color(0xFF06B6D4),
-      const Color(0xFF6366F1),
-      const Color(0xFFF43F5E),
+    final colors = const [
+      Color(0xFF3B82F6), Color(0xFF8B5CF6), Color(0xFFEC4899),
+      Color(0xFFF97316), Color(0xFF10B981), Color(0xFF06B6D4),
+      Color(0xFF6366F1), Color(0xFFF43F5E),
     ];
     final index = int.tryParse(photo.id) ?? 0;
     return colors[index % colors.length];
@@ -344,16 +398,14 @@ class _HomePageState extends State<HomePage> {
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         gradient: const LinearGradient(
-          colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
+            colors: [Color(0xFF2563EB), Color(0xFF3B82F6)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF2563EB).withValues(alpha: 0.4),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
+              color: const Color(0xFF2563EB).withValues(alpha: 0.4),
+              blurRadius: 16,
+              offset: const Offset(0, 6)),
         ],
       ),
       child: Material(
@@ -362,13 +414,14 @@ class _HomePageState extends State<HomePage> {
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const UploadPage()),
+              MaterialPageRoute(
+                  builder: (context) => const UploadPage()),
             );
           },
           customBorder: const CircleBorder(),
           child: const Center(
-            child: Icon(Icons.add, color: Colors.white, size: 30),
-          ),
+              child:
+                  Icon(Icons.add, color: Colors.white, size: 30)),
         ),
       ),
     );

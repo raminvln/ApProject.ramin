@@ -3,6 +3,7 @@ import 'package:album_frontend/models/album_model.dart';
 import 'package:album_frontend/screens/album_detail_page.dart';
 import 'package:album_frontend/services/mock_data.dart';
 import 'package:album_frontend/widgets/bottom_nav_bar.dart';
+import 'package:album_frontend/screens/create_album_page.dart';
 
 class AlbumsPage extends StatefulWidget {
   const AlbumsPage({super.key});
@@ -176,6 +177,7 @@ class _AlbumsPageState extends State<AlbumsPage> {
           ),
         );
       },
+      onLongPress: () => _showDeleteAlbumDialog(album),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
@@ -265,6 +267,42 @@ class _AlbumsPageState extends State<AlbumsPage> {
     );
   }
 
+  void _showDeleteAlbumDialog(AlbumModel album) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Delete Album'),
+        content: Text('Are you sure you want to delete "${album.name}"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Album "${album.name}" deleted'),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Color _getColorForAlbum(AlbumModel album) {
     switch (album.coverColor) {
       case 'green':
@@ -310,7 +348,12 @@ class _AlbumsPageState extends State<AlbumsPage> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () {},
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const CreateAlbumPage()),
+            );
+          },
           customBorder: const CircleBorder(),
           child: const Center(
             child: Icon(Icons.add, color: Colors.white, size: 30),

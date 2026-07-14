@@ -44,56 +44,101 @@ class _UploadPageState extends State<UploadPage> {
   }
 
   Future<void> _pickImage() async {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     showModalBottomSheet(
       context: context,
+      backgroundColor: Colors.transparent,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(height: 8),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+      builder: (context) => Container(
+        decoration: BoxDecoration(
+          color: isDark ? const Color(0xFF1E293B) : Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Select Photo',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-            ),
-            const SizedBox(height: 20),
-            ListTile(
-              leading: const Icon(Icons.photo_library, color: Color(0xFF2563EB)),
-              title: const Text('Choose from Gallery'),
-              onTap: () async {
-                Navigator.pop(context);
-                final XFile? image =
-                    await _picker.pickImage(source: ImageSource.gallery);
-                if (image != null) {
-                  setState(() => _selectedImage = File(image.path));
-                }
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.camera_alt, color: Color(0xFF2563EB)),
-              title: const Text('Take a Photo'),
-              onTap: () async {
-                Navigator.pop(context);
-                final XFile? image =
-                    await _picker.pickImage(source: ImageSource.camera);
-                if (image != null) {
-                  setState(() => _selectedImage = File(image.path));
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-          ],
+              const SizedBox(height: 20),
+              Text(
+                'Select Photo',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? Colors.white : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 20),
+              InkWell(
+                onTap: () async {
+                  Navigator.pop(context);
+                  final XFile? image =
+                      await _picker.pickImage(source: ImageSource.gallery);
+                  if (image != null) {
+                    setState(() => _selectedImage = File(image.path));
+                  }
+                },
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.photo_library,
+                          color: Color(0xFF2563EB)),
+                      const SizedBox(width: 16),
+                      Text(
+                        'Choose from Gallery',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4),
+              InkWell(
+                onTap: () async {
+                  Navigator.pop(context);
+                  final XFile? image =
+                      await _picker.pickImage(source: ImageSource.camera);
+                  if (image != null) {
+                    setState(() => _selectedImage = File(image.path));
+                  }
+                },
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.camera_alt, color: Color(0xFF2563EB)),
+                      const SizedBox(width: 16),
+                      Text(
+                        'Take a Photo',
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );
@@ -342,7 +387,7 @@ class _UploadPageState extends State<UploadPage> {
                 ),
               ),
               const SizedBox(height: 20),
-              // Albums - Multi Select
+              // Albums - Multi Select (بدون ListTile)
               Text(
                 'Albums',
                 style: TextStyle(
@@ -361,25 +406,45 @@ class _UploadPageState extends State<UploadPage> {
                 child: Column(
                   children: _albums.map((album) {
                     final isSelected = _selectedAlbums.contains(album);
-                    return CheckboxListTile(
-                      value: isSelected,
-                      onChanged: (_) => _toggleAlbum(album),
-                      title: Text(
-                        album,
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 14,
+                    return InkWell(
+                      onTap: () => _toggleAlbum(album),
+                      borderRadius: BorderRadius.circular(8),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 10),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 22,
+                              height: 22,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(
+                                  color: isSelected
+                                      ? const Color(0xFF2563EB)
+                                      : Colors.grey[400]!,
+                                  width: 2,
+                                ),
+                                color: isSelected
+                                    ? const Color(0xFF2563EB)
+                                    : Colors.transparent,
+                              ),
+                              child: isSelected
+                                  ? const Icon(Icons.check,
+                                      color: Colors.white, size: 16)
+                                  : null,
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              album,
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      activeColor: const Color(0xFF2563EB),
-                      checkColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      controlAffinity: ListTileControlAffinity.leading,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                      dense: true,
-                      visualDensity: VisualDensity.compact,
                     );
                   }).toList(),
                 ),
