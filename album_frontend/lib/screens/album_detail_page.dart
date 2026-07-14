@@ -163,16 +163,7 @@ class _AlbumDetailPageState extends State<AlbumDetailPage> {
                     _applyFilterAndSort();
                   },
                 ),
-                _buildMenuOption(
-                  sheetContext,
-                  'Most Liked',
-                  Icons.favorite,
-                  _sortBy == 'Most Liked',
-                  () {
-                    setState(() => _sortBy = 'Most Liked');
-                    _applyFilterAndSort();
-                  },
-                ),
+                
                 const Divider(indent: 16, endIndent: 16),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),

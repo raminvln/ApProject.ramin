@@ -7,7 +7,10 @@ import 'package:album_frontend/screens/profile_page.dart';
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
 
-  const BottomNavBar({super.key, required this.currentIndex});
+  const BottomNavBar({
+    super.key,
+    required this.currentIndex,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -28,34 +31,10 @@ class BottomNavBar extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(
-                context,
-                Icons.home_outlined,
-                Icons.home_filled,
-                'Home',
-                0,
-              ),
-              _buildNavItem(
-                context,
-                Icons.photo_album_outlined,
-                Icons.photo_album,
-                'Albums',
-                1,
-              ),
-              _buildNavItem(
-                context,
-                Icons.search_outlined,
-                Icons.search,
-                'Search',
-                2,
-              ),
-              _buildNavItem(
-                context,
-                Icons.person_outline,
-                Icons.person,
-                'Profile',
-                3,
-              ),
+              _buildNavItem(context, Icons.home_outlined, Icons.home_filled, 'Home', 0),
+              _buildNavItem(context, Icons.photo_album_outlined, Icons.photo_album, 'Albums', 1),
+              _buildNavItem(context, Icons.search_outlined, Icons.search, 'Search', 2),
+              _buildNavItem(context, Icons.person_outline, Icons.person, 'Profile', 3),
             ],
           ),
         ),
@@ -76,26 +55,26 @@ class BottomNavBar extends StatelessWidget {
         if (index == currentIndex) return;
 
         switch (index) {
-          case 0: // Home
+          case 0:
             Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(builder: (context) => const HomePage()),
               (route) => false,
             );
             break;
-          case 1: // Albums
+          case 1:
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const AlbumsPage()),
             );
             break;
-          case 2: // Search
+          case 2:
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const SearchPage()),
             );
             break;
-          case 3: // Profile
+          case 3:
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ProfilePage()),

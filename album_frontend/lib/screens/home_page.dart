@@ -21,6 +21,10 @@ class _HomePageState extends State<HomePage> {
   String _sortBy = 'Latest';
   String _filterBy = 'All';
 
+  // Multi-select state
+  bool _isSelecting = false;
+  final Set<String> _selectedPhotoIds = {};
+
   @override
   void initState() {
     super.initState();
@@ -48,22 +52,26 @@ class _HomePageState extends State<HomePage> {
     List<PhotoModel> photos = List.from(_allPhotos);
     final now = DateTime.now();
 
-    // Apply Filter
     switch (_filterBy) {
       case 'This Week':
-        final weekAgo = now.subtract(const Duration(days: 7));
-        photos = photos.where((p) => p.dateAdded.isAfter(weekAgo)).toList();
+        photos = photos
+            .where(
+              (p) => p.dateAdded.isAfter(now.subtract(const Duration(days: 7))),
+            )
+            .toList();
         break;
       case 'This Month':
-        final monthAgo = now.subtract(const Duration(days: 30));
-        photos = photos.where((p) => p.dateAdded.isAfter(monthAgo)).toList();
+        photos = photos
+            .where(
+              (p) =>
+                  p.dateAdded.isAfter(now.subtract(const Duration(days: 30))),
+            )
+            .toList();
         break;
     }
 
-    // اول گروه‌بندی بر اساس تاریخ
     var grouped = MockData.groupByDate(photos);
 
-    // بعد Sort داخل هر گروه
     if (_sortBy != 'Latest') {
       Map<String, List<PhotoModel>> sortedGrouped = {};
       for (var key in grouped.keys) {
@@ -71,9 +79,6 @@ class _HomePageState extends State<HomePage> {
         switch (_sortBy) {
           case 'A-Z':
             groupPhotos.sort((a, b) => a.title.compareTo(b.title));
-            break;
-          case 'Most Liked':
-            groupPhotos.sort((a, b) => b.likes.compareTo(a.likes));
             break;
         }
         sortedGrouped[key] = groupPhotos;
@@ -84,6 +89,180 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _groupedPhotos = grouped;
     });
+  }
+
+  void _toggleSelection(String photoId) {
+    setState(() {
+      if (_selectedPhotoIds.contains(photoId)) {
+        _selectedPhotoIds.remove(photoId);
+        if (_selectedPhotoIds.isEmpty) {
+          _isSelecting = false;
+        }
+      } else {
+        _selectedPhotoIds.add(photoId);
+      }
+    });
+  }
+
+  void _startSelection(String photoId) {
+    setState(() {
+      _isSelecting = true;
+      _selectedPhotoIds.add(photoId);
+    });
+  }
+
+  void _cancelSelection() {
+    setState(() {
+      _isSelecting = false;
+      _selectedPhotoIds.clear();
+    });
+  }
+
+  void _deleteSelected() {
+    final count = _selectedPhotoIds.length;
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Delete Photos'),
+        content: Text('Delete $count selected photo(s)?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              setState(() {
+                _allPhotos.removeWhere((p) => _selectedPhotoIds.contains(p.id));
+                _selectedPhotoIds.clear();
+                _isSelecting = false;
+                _applyFilterAndSort();
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('$count photo(s) deleted'),
+                  backgroundColor: Colors.green,
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: const Text('Delete', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _addSelectedToAlbum() {
+    final albums = [
+      'Nature',
+      'Travel',
+      'Work',
+      'Family',
+      'Food',
+      'City',
+      'Fitness',
+      'Memories',
+    ];
+    List<String> selectedAlbums = [];
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          title: const Text('Add to Album'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: albums.map((album) {
+                final isSelected = selectedAlbums.contains(album);
+                return InkWell(
+                  onTap: () => setDialogState(() {
+                    if (isSelected) {
+                      selectedAlbums.remove(album);
+                    } else {
+                      selectedAlbums.add(album);
+                    }
+                  }),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 22,
+                          height: 22,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(6),
+                            border: Border.all(
+                              color: isSelected
+                                  ? const Color(0xFF2563EB)
+                                  : Colors.grey[400]!,
+                              width: 2,
+                            ),
+                            color: isSelected
+                                ? const Color(0xFF2563EB)
+                                : Colors.transparent,
+                          ),
+                          child: isSelected
+                              ? const Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                  size: 16,
+                                )
+                              : null,
+                        ),
+                        const SizedBox(width: 12),
+                        Text(album, style: const TextStyle(fontSize: 15)),
+                      ],
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                setState(() {
+                  _selectedPhotoIds.clear();
+                  _isSelecting = false;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Added to ${selectedAlbums.length} album(s)'),
+                    backgroundColor: Colors.green,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2563EB),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text('Done', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showOptionsMenu() {
@@ -115,7 +294,6 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
-              // Sort Section
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
                 child: Align(
@@ -136,7 +314,7 @@ class _HomePageState extends State<HomePage> {
                 Icons.access_time,
                 _sortBy == 'Latest',
                 () {
-                  setState(() => _sortBy = 'Latest');
+                  _sortBy = 'Latest';
                   _applyFilterAndSort();
                 },
               ),
@@ -146,22 +324,11 @@ class _HomePageState extends State<HomePage> {
                 Icons.sort_by_alpha,
                 _sortBy == 'A-Z',
                 () {
-                  setState(() => _sortBy = 'A-Z');
-                  _applyFilterAndSort();
-                },
-              ),
-              _buildMenuOption(
-                sheetContext,
-                'Most Liked',
-                Icons.favorite,
-                _sortBy == 'Most Liked',
-                () {
-                  setState(() => _sortBy = 'Most Liked');
+                  _sortBy = 'A-Z';
                   _applyFilterAndSort();
                 },
               ),
               const Divider(indent: 16, endIndent: 16),
-              // Filter Section
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 4, 16, 4),
                 child: Align(
@@ -182,7 +349,7 @@ class _HomePageState extends State<HomePage> {
                 Icons.calendar_today,
                 _filterBy == 'All',
                 () {
-                  setState(() => _filterBy = 'All');
+                  _filterBy = 'All';
                   _applyFilterAndSort();
                 },
               ),
@@ -192,7 +359,7 @@ class _HomePageState extends State<HomePage> {
                 Icons.date_range,
                 _filterBy == 'This Week',
                 () {
-                  setState(() => _filterBy = 'This Week');
+                  _filterBy = 'This Week';
                   _applyFilterAndSort();
                 },
               ),
@@ -202,7 +369,7 @@ class _HomePageState extends State<HomePage> {
                 Icons.calendar_month,
                 _filterBy == 'This Month',
                 () {
-                  setState(() => _filterBy = 'This Month');
+                  _filterBy = 'This Month';
                   _applyFilterAndSort();
                 },
               ),
@@ -271,7 +438,7 @@ class _HomePageState extends State<HomePage> {
                   physics: const BouncingScrollPhysics(
                     decelerationRate: ScrollDecelerationRate.fast,
                   ),
-                  padding: const EdgeInsets.only(bottom: 80),
+                  padding: EdgeInsets.only(bottom: 80),
                   itemCount: _groupedPhotos.keys.length,
                   itemBuilder: (context, index) {
                     String dateKey = _groupedPhotos.keys.elementAt(index);
@@ -284,10 +451,10 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      floatingActionButton: _buildFloatingActionButton(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,
-      bottomNavigationBar: const BottomNavBar(currentIndex: 0),
-
+      floatingActionButton: _isSelecting ? null : _buildFloatingActionButton(),
+      bottomNavigationBar: _isSelecting
+          ? _buildSelectionBar()
+          : const BottomNavBar(currentIndex: 0),
     );
   }
 
@@ -301,73 +468,104 @@ class _HomePageState extends State<HomePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Photos',
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-              ),
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isDark ? const Color(0xFF1E293B) : Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+              _isSelecting
+                  ? Row(
+                      children: [
+                        GestureDetector(
+                          onTap: _cancelSelection,
+                          child: const Text(
+                            'Cancel',
+                            style: TextStyle(
+                              color: Color(0xFF2563EB),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          '${_selectedPhotoIds.length} selected',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      ],
+                    )
+                  : const Text(
+                      'Photos',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
-                  ],
-                ),
-                child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: _showOptionsMenu,
-                    customBorder: const CircleBorder(),
-                    child: const Icon(Icons.more_horiz, size: 22),
+              if (!_isSelecting)
+                Container(
+                  width: 44,
+                  height: 44,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: isDark ? const Color(0xFF1E293B) : Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: _showOptionsMenu,
+                      customBorder: const CircleBorder(),
+                      child: const Icon(Icons.more_horiz, size: 22),
+                    ),
                   ),
                 ),
-              ),
             ],
           ),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _searchController,
-            onChanged: _onSearchChanged,
-            decoration: InputDecoration(
-              hintText: 'Search photos...',
-              hintStyle: TextStyle(color: Colors.grey[400]),
-              prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
-              suffixIcon: _searchController.text.isNotEmpty
-                  ? IconButton(
-                      icon: const Icon(Icons.clear, size: 20),
-                      onPressed: () {
-                        _searchController.clear();
-                        _onSearchChanged('');
-                      },
-                    )
-                  : null,
-              filled: true,
-              fillColor: isDark
-                  ? const Color(0xFF1E293B)
-                  : const Color(0xFFF1F5F9),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
-              ),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide.none,
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(
-                  color: const Color(0xFF2563EB).withValues(alpha: 0.5),
+          if (!_isSelecting) ...[
+            const SizedBox(height: 16),
+            TextField(
+              controller: _searchController,
+              onChanged: _onSearchChanged,
+              decoration: InputDecoration(
+                hintText: 'Search photos...',
+                hintStyle: TextStyle(color: Colors.grey[400]),
+                prefixIcon: Icon(Icons.search, color: Colors.grey[400]),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, size: 20),
+                        onPressed: () {
+                          _searchController.clear();
+                          _onSearchChanged('');
+                        },
+                      )
+                    : null,
+                filled: true,
+                fillColor: isDark
+                    ? const Color(0xFF1E293B)
+                    : const Color(0xFFF1F5F9),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
                 ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide(
+                    color: const Color(0xFF2563EB).withValues(alpha: 0.5),
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 14),
               ),
-              contentPadding: const EdgeInsets.symmetric(vertical: 14),
             ),
-          ),
+          ],
         ],
       ),
     );
@@ -435,11 +633,26 @@ class _HomePageState extends State<HomePage> {
   Widget _buildPhotoCard(PhotoModel photo) {
     final screenWidth = MediaQuery.of(context).size.width;
     final cardWidth = (screenWidth - 48) / 3;
+    final isSelected = _selectedPhotoIds.contains(photo.id);
+
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => PhotoDetailPage(photo: photo)),
-      ),
+      onTap: () {
+        if (_isSelecting) {
+          _toggleSelection(photo.id);
+        } else {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PhotoDetailPage(photo: photo),
+            ),
+          );
+        }
+      },
+      onLongPress: () {
+        if (!_isSelecting) {
+          _startSelection(photo.id);
+        }
+      },
       child: Hero(
         tag: photo.id,
         flightShuttleBuilder:
@@ -461,6 +674,9 @@ class _HomePageState extends State<HomePage> {
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               color: _getColorForPhoto(photo),
+              border: isSelected
+                  ? Border.all(color: const Color(0xFF2563EB), width: 3)
+                  : null,
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withValues(alpha: 0.08),
@@ -522,9 +738,97 @@ class _HomePageState extends State<HomePage> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
+                // Selection overlay
+                if (_isSelecting)
+                  Positioned(
+                    top: 6,
+                    right: 6,
+                    child: Container(
+                      width: 26,
+                      height: 26,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isSelected
+                            ? const Color(0xFF2563EB)
+                            : Colors.black.withValues(alpha: 0.4),
+                        border: Border.all(color: Colors.white, width: 2),
+                      ),
+                      child: isSelected
+                          ? const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 16,
+                            )
+                          : null,
+                    ),
+                  ),
               ],
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSelectionBar() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            _buildActionButton(
+              Icons.photo_album_outlined,
+              'Add to Album',
+              () => _addSelectedToAlbum(),
+            ),
+            _buildActionButton(
+              Icons.delete_outline,
+              'Delete',
+              () => _deleteSelected(),
+              isDestructive: true,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButton(
+    IconData icon,
+    String label,
+    VoidCallback onTap, {
+    bool isDestructive = false,
+  }) {
+    final color = isDestructive ? Colors.red : const Color(0xFF2563EB);
+    return GestureDetector(
+      onTap: _selectedPhotoIds.isEmpty ? null : onTap,
+      child: Opacity(
+        opacity: _selectedPhotoIds.isEmpty ? 0.4 : 1.0,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: color, size: 24),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(
+                color: color,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
         ),
       ),
     );
