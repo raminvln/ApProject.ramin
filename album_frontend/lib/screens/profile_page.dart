@@ -97,8 +97,9 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: const Text('Change Password'),
           content: SingleChildScrollView(
             child: Column(
@@ -119,14 +120,19 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline,
-                            color: Colors.red, size: 18),
+                        const Icon(
+                          Icons.error_outline,
+                          color: Colors.red,
+                          size: 18,
+                        ),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             errorText!,
                             style: const TextStyle(
-                                color: Colors.red, fontSize: 13),
+                              color: Colors.red,
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                       ],
@@ -150,8 +156,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             : Icons.visibility,
                       ),
                       onPressed: () {
-                        setDialogState(
-                            () => obscureCurrent = !obscureCurrent);
+                        setDialogState(() => obscureCurrent = !obscureCurrent);
                       },
                     ),
                     border: OutlineInputBorder(
@@ -201,8 +206,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             : Icons.visibility,
                       ),
                       onPressed: () {
-                        setDialogState(
-                            () => obscureConfirm = !obscureConfirm);
+                        setDialogState(() => obscureConfirm = !obscureConfirm);
                       },
                     ),
                     border: OutlineInputBorder(
@@ -235,65 +239,67 @@ class _ProfilePageState extends State<ProfilePage> {
                   // چک پسورد فعلی
                   if (currentPasswordController.text != _user.password) {
                     setDialogState(
-                        () => errorText = 'Current password is incorrect');
+                      () => errorText = 'Current password is incorrect',
+                    );
                     return;
                   }
                   // چک خالی نبودن
                   if (newPasswordController.text.isEmpty) {
                     setDialogState(
-                        () => errorText = 'Please enter a new password');
+                      () => errorText = 'Please enter a new password',
+                    );
                     return;
                   }
                   // چک تکراری نبودن
                   if (newPasswordController.text == _user.password) {
-                    setDialogState(() =>
-                        errorText =
-                            'New password must be different from current password');
+                    setDialogState(
+                      () => errorText =
+                          'New password must be different from current password',
+                    );
                     return;
                   }
                   // چک فرمت پسورد جدید
                   if (newPasswordController.text.length < 8) {
-                    setDialogState(() =>
-                        errorText =
-                            'Password must be at least 8 characters');
+                    setDialogState(
+                      () =>
+                          errorText = 'Password must be at least 8 characters',
+                    );
                     return;
                   }
-                  if (!newPasswordController.text
-                      .contains(RegExp(r'[A-Z]'))) {
-                    setDialogState(() =>
-                        errorText =
-                            'Password must contain at least one uppercase letter');
+                  if (!newPasswordController.text.contains(RegExp(r'[A-Z]'))) {
+                    setDialogState(
+                      () => errorText =
+                          'Password must contain at least one uppercase letter',
+                    );
                     return;
                   }
-                  if (!newPasswordController.text
-                      .contains(RegExp(r'[a-z]'))) {
-                    setDialogState(() =>
-                        errorText =
-                            'Password must contain at least one lowercase letter');
+                  if (!newPasswordController.text.contains(RegExp(r'[a-z]'))) {
+                    setDialogState(
+                      () => errorText =
+                          'Password must contain at least one lowercase letter',
+                    );
                     return;
                   }
-                  if (!newPasswordController.text
-                      .contains(RegExp(r'[0-9]'))) {
-                    setDialogState(() =>
-                        errorText =
-                            'Password must contain at least one digit');
+                  if (!newPasswordController.text.contains(RegExp(r'[0-9]'))) {
+                    setDialogState(
+                      () => errorText =
+                          'Password must contain at least one digit',
+                    );
                     return;
                   }
-                  if (newPasswordController.text
-                          .toLowerCase()
-                          .contains(_user.userName
-                              .toLowerCase()
-                              .split('@')[0]) &&
+                  if (newPasswordController.text.toLowerCase().contains(
+                        _user.userName.toLowerCase().split('@')[0],
+                      ) &&
                       _user.userName.contains('@')) {
-                    setDialogState(() =>
-                        errorText = 'Password cannot contain your username');
+                    setDialogState(
+                      () => errorText = 'Password cannot contain your username',
+                    );
                     return;
                   }
                   // چک تطابق
                   if (newPasswordController.text !=
                       confirmPasswordController.text) {
-                    setDialogState(
-                        () => errorText = 'Passwords do not match');
+                    setDialogState(() => errorText = 'Passwords do not match');
                     return;
                   }
                   // همه چی اوکیه
@@ -381,8 +387,7 @@ class _ProfilePageState extends State<ProfilePage> {
         ? Colors.white.withValues(alpha: 0.6)
         : const Color(0xFF6B7280);
     final cardColor = isDark ? const Color(0xFF1E293B) : Colors.white;
-    final bgColor =
-        isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final bgColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -404,8 +409,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color:
-                            const Color(0xFF2563EB).withValues(alpha: 0.3),
+                        color: const Color(0xFF2563EB).withValues(alpha: 0.3),
                         blurRadius: 20,
                         offset: const Offset(0, 8),
                       ),
@@ -434,10 +438,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(height: 4),
                 Text(
                   _user.userName,
-                  style: TextStyle(
-                    color: subtitleColor,
-                    fontSize: 14,
-                  ),
+                  style: TextStyle(color: subtitleColor, fontSize: 14),
                 ),
                 const SizedBox(height: 28),
                 Container(
@@ -456,15 +457,23 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      _buildStatItem(Icons.photo_library,
-                          '${_user.photoCount}', 'Photos', textColor),
+                      _buildStatItem(
+                        Icons.photo_library,
+                        '${_user.photoCount}',
+                        'Photos',
+                        textColor,
+                      ),
                       Container(
                         width: 1,
                         height: 40,
                         color: Colors.grey.withValues(alpha: 0.3),
                       ),
-                      _buildStatItem(Icons.photo_album,
-                          '${_user.albumCount}', 'Albums', textColor),
+                      _buildStatItem(
+                        Icons.photo_album,
+                        '${_user.albumCount}',
+                        'Albums',
+                        textColor,
+                      ),
                     ],
                   ),
                 ),
@@ -528,8 +537,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   child: OutlinedButton(
                     onPressed: _showLogoutDialog,
                     style: OutlinedButton.styleFrom(
-                      side:
-                          BorderSide(color: Colors.red.withValues(alpha: 0.5)),
+                      side: BorderSide(
+                        color: Colors.red.withValues(alpha: 0.5),
+                      ),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),
                       ),
@@ -549,12 +559,16 @@ class _ProfilePageState extends State<ProfilePage> {
           ),
         ),
       ),
-      bottomNavigationBar: const BottomNavBar(currentIndex: 5),
+      bottomNavigationBar: const BottomNavBar(currentIndex: 3),
     );
   }
 
   Widget _buildStatItem(
-      IconData icon, String value, String label, Color textColor) {
+    IconData icon,
+    String value,
+    String label,
+    Color textColor,
+  ) {
     return Column(
       children: [
         Icon(icon, color: const Color(0xFF2563EB), size: 28),
@@ -567,13 +581,7 @@ class _ProfilePageState extends State<ProfilePage> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        Text(
-          label,
-          style: TextStyle(
-            color: Colors.grey[500],
-            fontSize: 12,
-          ),
-        ),
+        Text(label, style: TextStyle(color: Colors.grey[500], fontSize: 12)),
       ],
     );
   }
@@ -623,10 +631,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: TextStyle(
-                      color: subtitleColor,
-                      fontSize: 13,
-                    ),
+                    style: TextStyle(color: subtitleColor, fontSize: 13),
                   ),
                 ],
               ),
@@ -654,8 +659,9 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
           title: Text(title),
           content: TextField(
             controller: controller,

@@ -252,8 +252,17 @@ class MockData {
 
   static List<AlbumModel> getAlbums() {
     final allPhotos = getPhotos();
+    final favoritedPhotos = allPhotos.where((p) => p.isFavorite).toList();
 
     return [
+      // Favorites - آلبوم هوشمند (همیشه اول)
+      AlbumModel(
+        id: 'fav',
+        name: 'Favorites',
+        photos: favoritedPhotos,
+        createdAt: DateTime(2026, 1, 1),
+        coverColor: 'red',
+      ),
       AlbumModel(
         id: '1',
         name: 'Nature',
@@ -381,6 +390,7 @@ class MockData {
       ),
     ];
   }
+
   static Map<String, List<String>> getAlbumPhotoMap() {
     return {
       'Nature': ['1', '13', '14'],
@@ -392,5 +402,5 @@ class MockData {
       'Fitness': ['7', '13', '6'],
       'Memories': ['19', '17', '16', '11'],
     };
-}
+  }
 }

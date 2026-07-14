@@ -7,10 +7,7 @@ import 'package:album_frontend/screens/profile_page.dart';
 class BottomNavBar extends StatelessWidget {
   final int currentIndex;
 
-  const BottomNavBar({
-    super.key,
-    required this.currentIndex,
-  });
+  const BottomNavBar({super.key, required this.currentIndex});
 
   @override
   Widget build(BuildContext context) {
@@ -27,22 +24,38 @@ class BottomNavBar extends StatelessWidget {
       ),
       child: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildNavItem(context, Icons.home_outlined, Icons.home_filled,
-                  'Home', 0),
-              _buildNavItem(context, Icons.photo_album_outlined,
-                  Icons.photo_album, 'Albums', 1),
-              _buildNavItem(context, Icons.search_outlined, Icons.search,
-                  'Search', 2),
-              _buildNavItem(context, Icons.favorite_outline, Icons.favorite,
-                  'Favorites', 3),
-              _buildNavItem(context, Icons.public_outlined, Icons.public,
-                  'Explore', 4),
-              _buildNavItem(context, Icons.person_outline, Icons.person,
-                  'Profile', 5),
+              _buildNavItem(
+                context,
+                Icons.home_outlined,
+                Icons.home_filled,
+                'Home',
+                0,
+              ),
+              _buildNavItem(
+                context,
+                Icons.photo_album_outlined,
+                Icons.photo_album,
+                'Albums',
+                1,
+              ),
+              _buildNavItem(
+                context,
+                Icons.search_outlined,
+                Icons.search,
+                'Search',
+                2,
+              ),
+              _buildNavItem(
+                context,
+                Icons.person_outline,
+                Icons.person,
+                'Profile',
+                3,
+              ),
             ],
           ),
         ),
@@ -82,13 +95,7 @@ class BottomNavBar extends StatelessWidget {
               MaterialPageRoute(builder: (context) => const SearchPage()),
             );
             break;
-          case 3: // Favorites
-            // TODO
-            break;
-          case 4: // Explore
-            // TODO
-            break;
-          case 5: // Profile
+          case 3: // Profile
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const ProfilePage()),
@@ -98,7 +105,7 @@ class BottomNavBar extends StatelessWidget {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         decoration: BoxDecoration(
           color: isSelected
               ? const Color(0xFF2563EB).withValues(alpha: 0.1)
