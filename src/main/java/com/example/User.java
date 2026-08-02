@@ -1,6 +1,5 @@
 package com.example;
 
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,10 +12,18 @@ public class User {
     private List<Album> albums = new ArrayList<>();
     private boolean isBanned = false;
 
-    public User(String displayName,String name, String password) {
+    public User(String displayName, String name, String password) {
         this.displayName = displayName;
         this.userName = name;
         this.password = password;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public boolean isBanned() {
