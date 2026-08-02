@@ -31,8 +31,8 @@ public class UserAndAlbumTest {
     @BeforeEach
     public void initializeAndSomeAdd() {
         UserManager.getUsers().clear();
-        ali = new User("AliAlavi@gmail.com", "abcdDEfg3456");
-        taghi = new User("TaghiTaghavi@gmail.com", "hijkLmNoe345");
+        ali = new User("ali","AliAlavi@gmail.com", "abcdDEfg3456");
+        taghi = new User("taghi","TaghiTaghavi@gmail.com", "hijkLmNoe345");
         p1 = new Picture("pride.jpg", ali.getUserName());
         p2 = new Picture("l90.jpg", ali.getUserName());
         p3 = new Picture("roz.jpg", ali.getUserName());

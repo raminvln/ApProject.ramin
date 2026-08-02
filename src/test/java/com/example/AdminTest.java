@@ -32,9 +32,9 @@ public class AdminTest {
     @BeforeEach
     public void intialize() {
         UserManager.getUsers().clear();
-        admin = new Admin("AdiAdavi@gmail.com", "adminHASTAM123456");
-        ali = new User("AliAlavi@gmail.com", "abcdDEfg3456");
-        taghi = new User("TaghiTaghavi@gmail.com", "hijkLmNoe345");
+        admin = new Admin("admin","AdiAdavi@gmail.com", "adminHASTAM123456");
+        ali = new User("ali","AliAlavi@gmail.com", "abcdDEfg3456");
+        taghi = new User("taghi","TaghiTaghavi@gmail.com", "hijkLmNoe345");
         p1 = new Picture("pride.jpg", ali.getUserName());
         p2 = new Picture("l90.jpg", ali.getUserName());
         p3 = new Picture("roz.jpg", ali.getUserName());

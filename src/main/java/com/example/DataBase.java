@@ -12,7 +12,15 @@ import com.google.gson.reflect.TypeToken;
 
 
 public class DataBase {
-
+    public static void main(String[] args) throws IOException{
+        User u1 = new User("null", "null");
+                Gson gson = new GsonBuilder()
+                .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+                .setPrettyPrinting()
+                .create();
+        String json = gson.toJson(u1);
+        Files.writeString(Path.of("user.json"),json);
+    }
     public static void saveUsersToFile() throws IOException {
         Gson gson = new GsonBuilder()
                 .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())

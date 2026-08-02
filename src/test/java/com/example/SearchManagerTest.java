@@ -32,8 +32,8 @@ public class SearchManagerTest {
 
         UserManager.getUsers().clear();
 
-        ali = new User("AliAlavi@gmail.com", "abcdDEfg3456");
-        taghi = new User("TaghiTaghavi@gmail.com", "hijkLmNoe345");
+        ali = new User("ali","AliAlavi@gmail.com", "abcdDEfg3456");
+        taghi = new User("taghi","TaghiTaghavi@gmail.com", "hijkLmNoe345");
 
         p1 = new Picture("pride.jpg", ali.getUserName());
         p2 = new Picture("l90.jpg", ali.getUserName());
@@ -138,8 +138,8 @@ public class SearchManagerTest {
 
     @Test
     public void filterMoreThanLikesTest() {
-        User user1 = new User("user1@gmail.com", "Password123");
-        User user2 = new User("user2@gmail.com", "Password123");
+        User user1 = new User("user1","user1@gmail.com", "Password123");
+        User user2 = new User("user2","user2@gmail.com", "Password123");
         p1.increaseLikes(user1);
         p1.increaseLikes(user2);
         p2.increaseLikes(user1);

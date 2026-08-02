@@ -14,9 +14,9 @@ public class UserManagerTest {
     @BeforeEach
     public void initializeAndSomeAdd() {
         UserManager.getUsers().clear();
-        ali = new User("AliAlavi@gmail.com", "abcdDEfg3456");
-        taghi = new User("TaghiTaghavi@gmail.com", "hijkLmNoe345");
-        admin = new Admin("AdiAdavi@gmail.com", "qrsTUV123");
+        ali = new User("ali","AliAlavi@gmail.com", "abcdDEfg3456");
+        taghi = new User("taghi","TaghiTaghavi@gmail.com", "hijkLmNoe345");
+        admin = new Admin("admin","AdiAdavi@gmail.com", "qrsTUV123");
         users = new ArrayList<>();
         UserManager.addUser(admin);
         UserManager.addUser(ali);
@@ -51,7 +51,7 @@ public class UserManagerTest {
         assertEquals(users, UserManager.getUsers());
         UserManager.removeUser(taghi);
         users.remove(taghi);
-        taghi = new User("TaghiTaghavi@gmail.com", "hijkLmNoe");
+        taghi = new User("taghi","TaghiTaghavi@gmail.com", "hijkLmNoe");
         UserManager.addUser(taghi);
         assertEquals(users, UserManager.getUsers()); // taghi is not in the list becuase his password is invalid
         taghi.setPassword("hijkLmNoe345"); // change his password (admin cannot do that becuase taghi is not in the list

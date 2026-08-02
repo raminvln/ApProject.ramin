@@ -1,6 +1,5 @@
 package com.example;
 
-import java.io.IOException;
 import java.util.*;
 
 public class Album {
@@ -40,11 +39,6 @@ public class Album {
                 && ownerName.equals(picture.getOwnerName())) {
             pictureNames.add(picture.getName());
             picture.getAlbumsNames().add(name);
-            try {
-                DataBase.saveUsersToFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 
@@ -52,11 +46,6 @@ public class Album {
         if (pictureNames.contains(picture.getName())) {
             pictureNames.remove(picture.getName());
             picture.getAlbumsNames().remove(name);
-            try {
-                DataBase.saveUsersToFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 }
