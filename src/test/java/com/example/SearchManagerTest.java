@@ -94,13 +94,7 @@ public class SearchManagerTest {
         p4.addTag("flower");
         p5.addTag("nature");
 
-        p1.setPublic(true);
-        p2.setPublic(true);
-        p3.setPublic(true);
-        p1.addComment(new Comment(taghi.getUserName(), "beautiful car"));
-        p1.addComment(new Comment(taghi.getUserName(), "red car"));
-        p2.addComment(new Comment(taghi.getUserName(), "old car"));
-        p3.addComment(new Comment(ali.getUserName(), "nice flower"));
+
     }
 
     @Test
@@ -129,12 +123,6 @@ public class SearchManagerTest {
         assertFalse(result.contains(p3));
     }
 
-    @Test
-    public void searchByCommentTest() {
-        List<Picture> result = SearchManager.searchByComment("beautiful", ali);
-        assertEquals(1, result.size());
-        assertTrue(result.contains(p1));
-    }
 
     @Test
     public void sortByNameTest() {
@@ -146,20 +134,7 @@ public class SearchManagerTest {
         assertEquals(p3, result.get(4)); // roz
     }
 
-    @Test
-    public void sortByLikesTest() {
 
-        User user1 = new User("user1@gmail.com", "Password123");
-        User user2 = new User("user2@gmail.com", "Password123");
-        User user3 = new User("user3@gmail.com", "Password123");
-        user1.likePicture(p1);
-        user2.likePicture(p1);
-        user3.likePicture(p1);
-        user1.likePicture(p2);
-        List<Picture> result = SearchManager.sortByLikes(ali);
-        assertEquals(p1, result.get(0));
-        assertEquals(p2, result.get(1));
-    }
 
     @Test
     public void filterMoreThanLikesTest() {

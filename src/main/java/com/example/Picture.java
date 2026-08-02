@@ -1,6 +1,4 @@
 package com.example;
-
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +10,6 @@ public class Picture {
     private String name;
     private String ownerName;
     private boolean commentsAllowed = false;
-    private boolean isPublic = false;
     private LocalDateTime timeOfAdd;
     private List<String> albumNames = new ArrayList<>();
     private List<String> tags = new ArrayList<>();
@@ -20,7 +17,6 @@ public class Picture {
     private List<String> peopleInPicture = new ArrayList<>();
     private boolean isLikedByTheOwner = false;
     private int likes = 0;
-    private List<Comment> comments = new ArrayList<>();
     private List<String> likerNames = new ArrayList<>();
 
     public List<String> getLikers() {
@@ -80,24 +76,13 @@ public class Picture {
         this.timeOfAdd = timeOfAdd;
     }
 
-    public boolean isPublic() {
-        return isPublic;
-    }
-
     public String getName() {
         return name;
     }
 
-    public List<Comment> getComments() {
-        return comments;
-    }
 
     public boolean isCommentsAllowed() {
         return commentsAllowed;
-    }
-
-    public void setPublic(boolean isPublic) {
-        this.isPublic = isPublic;
     }
 
     public void setCommentsAllowed(boolean commentsAllowed) {
@@ -123,18 +108,6 @@ public class Picture {
         if (likerNames.contains(user.getUserName())) {
             likes--;
             likerNames.remove(user.getUserName());
-        }
-    }
-
-    public void addComment(Comment comment) {
-        if (isPublic) {
-            comments.add(comment);
-            comment.setCreationTime(LocalDateTime.now());
-            try {
-                DataBase.saveUsersToFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
     }
 

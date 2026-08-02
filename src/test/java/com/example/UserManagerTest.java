@@ -79,5 +79,4 @@ public class UserManagerTest {
         assertTrue(UserManager.userNameExists("TaghiTaghavi@gmail.com"));
         System.out.println(UserManager.getUsers());
     }
-
 }

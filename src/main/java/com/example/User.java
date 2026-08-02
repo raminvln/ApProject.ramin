@@ -136,29 +136,6 @@ public class User {
             password = newPassword;
     }
 
-    public void likePicture(Picture picture)  {
-        if (!isBanned && picture.isPublic()) {
-            picture.increaseLikes(this);
-            try {
-                DataBase.saveUsersToFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void unLikePicture(Picture picture)  {
-        if (!isBanned) {
-            picture.decreasLikes(this);
-            try {
-                DataBase.saveUsersToFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;

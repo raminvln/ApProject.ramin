@@ -21,13 +21,6 @@ public class SearchManager {
                                 .collect(Collectors.toList());
         }
 
-        public static List<Picture> searchByComment(String commentText, User user) {
-                return user.getPictures().stream()
-                                .filter(picture -> picture.getComments().stream()
-                                                .anyMatch(comment -> comment.getText().toLowerCase()
-                                                                .contains(commentText.toLowerCase())))
-                                .collect(Collectors.toList());
-        }
 
         public static List<Picture> searchByTag(String tagSearch, User user) {
                 return user.getPictures().stream()
