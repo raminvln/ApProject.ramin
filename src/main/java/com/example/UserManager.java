@@ -17,7 +17,7 @@ public class UserManager {
         if (!users.contains(user) && isPasswordAllowed(user.getPassword()) && isUserNameAllowed(user.getUserName())) {
             users.add(user);
             try {
-                DataBase.saveUsersToFile();
+                DataBase.saveUserToFile(user);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -27,7 +27,7 @@ public class UserManager {
     public static void removeUser(User user)  {
         users.remove(user);
         try {
-            DataBase.saveUsersToFile();
+            DataBase.deleteUserFile(user);
         } catch (IOException e) {
             e.printStackTrace();
         }
