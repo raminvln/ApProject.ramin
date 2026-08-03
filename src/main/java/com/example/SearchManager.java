@@ -48,19 +48,6 @@ public class SearchManager {
                                 .collect(Collectors.toList());
         }
 
-        public static List<Picture> sortByLikes(User user) {
-                return user.getPictures().stream()
-                                .sorted((picture1, picture2) -> Integer.compare(picture2.getLikes(),
-                                                picture1.getLikes()))
-                                .collect(Collectors.toList());
-        }
-
-        public static List<Picture> filterMoreThanLikes(User user, int likes) {
-                return user.getPictures().stream()
-                                .filter(picture -> picture.getLikes() > likes)
-                                .collect(Collectors.toList());
-        }
-
         public static List<Picture> filterAfterThisDate(User user, LocalDateTime dateTime) {
                 return user.getPictures().stream()
                                 .filter(picture -> picture.getTimeOfAdd().isAfter(dateTime))

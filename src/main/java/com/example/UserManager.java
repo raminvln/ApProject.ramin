@@ -13,18 +13,29 @@ public class UserManager {
     private UserManager() {
     }
 
-    public static synchronized void addUser(User user) {
-        if (!users.contains(user) && isPasswordAllowed(user.getPassword()) && isUserNameAllowed(user.getUserName())) {
-            users.add(user);
-            try {
-                DataBase.saveUserToFile(user);
-            } catch (IOException e) {
-                e.printStackTrace();
+    public static synchronized String addUser(User user) {
+        if (!users.contains(user)) {
+            if (isUserNameAllowed(user.getUserName())) {
+                if (isPasswordAllowed(user.getPassword())) {
+                    users.add(user);
+                    try {
+                        DataBase.saveUserToFile(user);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return "added";
+                } else {
+                    return "badpassword";
+                }
+            } else {
+                return "badusername";
             }
+        } else {
+            return "alreadyhaveaccount";
         }
     }
 
-    public static synchronized void removeUser(User user)  {
+    public static synchronized void removeUser(User user) {
         users.remove(user);
         try {
             DataBase.deleteUserFile(user);
@@ -48,9 +59,11 @@ public class UserManager {
     public synchronized static List<User> getUsers() {
         return users;
     }
+
     public synchronized static void setUsers(List<User> users2) {
         users = users2;
     }
+
     public synchronized static boolean userNameExists(String userName) {
         for (User user : users) {
             if (userName.equals(user.getUserName())) {
@@ -58,5 +71,5 @@ public class UserManager {
             }
         }
         return false;
-    } 
+    }
 }

@@ -1,4 +1,5 @@
 package com.example;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,22 +17,28 @@ public class Picture {
     private String caption;
     private List<String> peopleInPicture = new ArrayList<>();
     private boolean isLikedByTheOwner = false;
-    private int likes = 0;
-
-
 
     public Picture(String name, String ownerName) {
         this.name = name;
         this.ownerName = ownerName;
     }
 
+    public void setPeopleInPicture(List<String> peopleInPicture) {
+        this.peopleInPicture = peopleInPicture;
+    }
+
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+
     public String getCaption() {
         return caption;
     }
-
-    public int getLikes() {
-        return likes;
+    
+    public void setAlbumNames(List<String> albumNames) {
+        this.albumNames = albumNames;
     }
+
 
     public void setCaption(String caption) {
         this.caption = caption;
@@ -76,7 +83,6 @@ public class Picture {
     public String getName() {
         return name;
     }
-
 
     public boolean isCommentsAllowed() {
         return commentsAllowed;
