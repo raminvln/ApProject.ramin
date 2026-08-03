@@ -17,11 +17,8 @@ public class Picture {
     private List<String> peopleInPicture = new ArrayList<>();
     private boolean isLikedByTheOwner = false;
     private int likes = 0;
-    private List<String> likerNames = new ArrayList<>();
 
-    public List<String> getLikers() {
-        return likerNames;
-    }
+
 
     public Picture(String name, String ownerName) {
         this.name = name;
@@ -95,20 +92,6 @@ public class Picture {
 
     public void addPerson(String person) {
         peopleInPicture.add(person);
-    }
-
-    public void increaseLikes(User user) {
-        if (!likerNames.contains(user.getUserName())) {
-            likes++;
-            likerNames.add(user.getUserName());
-        }
-    }
-
-    public void decreasLikes(User user) {
-        if (likerNames.contains(user.getUserName())) {
-            likes--;
-            likerNames.remove(user.getUserName());
-        }
     }
 
     @Override

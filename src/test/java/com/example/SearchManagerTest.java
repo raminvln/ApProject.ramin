@@ -135,19 +135,6 @@ public class SearchManagerTest {
     }
 
 
-
-    @Test
-    public void filterMoreThanLikesTest() {
-        User user1 = new User("user1","user1@gmail.com", "Password123");
-        User user2 = new User("user2","user2@gmail.com", "Password123");
-        p1.increaseLikes(user1);
-        p1.increaseLikes(user2);
-        p2.increaseLikes(user1);
-        List<Picture> result = SearchManager.filterMoreThanLikes(ali, 1);
-        assertEquals(1, result.size());
-        assertTrue(result.contains(p1));
-    }
-
     @Test
     public void filterAfterThisDateTest() {
         p1.setTimeOfAdd(LocalDate.of(2024, 1, 1).atTime(10, 0));
