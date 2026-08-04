@@ -1,4 +1,5 @@
 package com.example;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -6,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import java.util.List;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
@@ -36,11 +38,32 @@ public class ClientHandler implements Runnable {
                 case "/register":
                     response = handleRegister(request);
                     break;
-                case "/photos":
-                    response = handlePhotos(request);
+                case "/pictures":
+                    response = handlePictures(request);
                     break;
-                case "/photos/add":
-                    response = handlePhotosAdd(request);
+                case "/pictures/add":
+                    response = handlePicturesAdd(request);
+                    break;
+                case "/pictures/delete":
+                    response = handlePicturesDelete(request);
+                    break;
+                case "/pictures/favorite":
+                    response = handlePicturesFavorite(request);
+                    break;
+                case "/albums":
+                    response = handleAlbums(request);
+                    break;
+                case "/albums/create":
+                    response = handleAlbumsCreate(request);
+                    break;
+                case "/albums/delete":
+                    response = handleAlbumsDelete(request);
+                    break;
+                case "/albums/add-picture":
+                    response = handleAlbumsAddPicture(request);
+                    break;
+                case "/albums/remove-picture":
+                    response = handleAlbumsRemovePicture(request);
                     break;
                 default:
                     response.setStatusCode(404);
@@ -55,7 +78,12 @@ public class ClientHandler implements Runnable {
         }
     }
 
-    // handler methods
+    /////////////////////
+    /////////////////////
+    // HANDLER METHODS //
+    /////////////////////
+    /////////////////////
+
     public Response handleLogin(Request request) {
         Response response = new Response();
         JsonObject payload = request.getPayload();
@@ -119,7 +147,7 @@ public class ClientHandler implements Runnable {
         return response;
     }
 
-    public Response handlePhotos(Request request) {
+    public Response handlePictures(Request request) {
         Response response = new Response();
         User user = findUser(request.getUserName());
         if (user == null) {
@@ -135,7 +163,7 @@ public class ClientHandler implements Runnable {
         return response;
     }
 
-    public Response handlePhotosAdd(Request request) {
+    public Response handlePicturesAdd(Request request) {
         User user = findUser(request.getUserName());
         if (user == null) {
             Response response = new Response();
@@ -181,6 +209,254 @@ public class ClientHandler implements Runnable {
         response.setStatusCode(200);
         response.setMessage("picture added successfully");
         return response;
+    }
+
+    public Response handlePicturesDelete(Request request) {
+        User user = findUser(request.getUserName());
+        JsonObject payload = request.getPayload();
+        Response response = new Response();
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+        String pictureName = payload.get("pictureName").getAsString();
+        Picture picture = user.getPictures().stream().filter(pic -> pic.getName().equals(pictureName)).findFirst()
+                .orElse(null);
+
+        if (picture == null) {
+            response.setStatusCode(404);
+            response.setMessage("This picture dosn't exist");
+            return response;
+        }
+        for (Album album : user.getAlbums()) {
+            album.removePicture(picture);
+        }
+        user.getPictures().remove(picture);
+        try {
+            DataBase.saveUserToFile(user);
+        } catch (IOException e) {
+            response.setStatusCode(500);
+            response.setMessage("Failed to save");
+            return response;
+        }
+        response.setStatusCode(200);
+        response.setMessage("The picture deleted successfully");
+        return response;
+    }
+
+    public Response handlePicturesFavorite(Request request) {
+        User user = findUser(request.getUserName());
+        Response response = new Response();
+
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+
+        JsonObject payload = request.getPayload();
+        String pictureName = payload.get("pictureName").getAsString();
+        Picture picture = user.getPictures().stream().filter(pic -> pic.getName().equals(pictureName)).findFirst()
+                .orElse(null);
+
+        if (picture == null) {
+            response.setStatusCode(404);
+            response.setMessage("This picture dosn't exist");
+            return response;
+        }
+        if (picture.isLikedByTheOwner()) {
+            picture.setLikedByTheOwner(false);
+            response.setStatusCode(200);
+            response.setMessage("The picture unliked successflly");
+        } else {
+            picture.setLikedByTheOwner(true);
+            response.setStatusCode(200);
+            response.setMessage("The picutre liked succsessflly");
+        }
+        try {
+            DataBase.saveUserToFile(user);
+        } catch (IOException e) {
+            response.setStatusCode(500);
+            response.setMessage("Failed to save");
+            return response;
+        }
+        return response;
+    }
+
+    public Response handleAlbums(Request request) {
+        User user = findUser(request.getUserName());
+        Response response = new Response();
+        JsonObject payload = new JsonObject();
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+        payload.add("albums", new Gson().toJsonTree(user.getAlbums()));
+        response.setStatusCode(200);
+        response.setMessage("albums are ready");
+        response.setPayload(payload);
+        return response;
+    }
+
+    public Response handleAlbumsCreate(Request request) {
+        User user = findUser(request.getUserName());
+        Response response = new Response();
+
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+
+        JsonObject payload = request.getPayload();
+        String albumName = payload.get("name").getAsString();
+        if (!user.getAlbums().stream().anyMatch(album -> album.getName().equals(albumName))) {
+            Album album = new Album(albumName, user.getUserName());
+            user.addAlbum(album);
+            try {
+                DataBase.saveUserToFile(user);
+                response.setStatusCode(200);
+                response.setMessage("album" + albumName + "created succsessflly");
+            } catch (IOException e) {
+                response.setStatusCode(500);
+                response.setMessage("Fail to save");
+            }
+        } else {
+            response.setStatusCode(409);
+            response.setMessage("Album with this name already exists");
+        }
+        return response;
+    }
+
+    public Response handleAlbumsDelete(Request request) {
+        User user = findUser(request.getUserName());
+        Response response = new Response();
+
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+        JsonObject payload = request.getPayload();
+        String albumName = payload.get("albumName").getAsString();
+        Album album = user.getAlbums().stream().filter(alb -> alb.getName().equals(albumName)).findFirst()
+                .orElse(null);
+
+        if (album == null) {
+            response.setStatusCode(404);
+            response.setMessage("This album dosn't exist");
+            return response;
+        }
+        for (Picture picture : user.getPictures()) {
+            picture.getAlbumsNames().remove(album.getName());
+        }
+        user.getAlbums().remove(album);
+        try {
+            DataBase.saveUserToFile(user);
+        } catch (IOException e) {
+            response.setStatusCode(500);
+            response.setMessage("Failed to save");
+            return response;
+        }
+        response.setStatusCode(200);
+        response.setMessage("The album deleted successfully");
+        return response;
+    }
+
+    public Response handleAlbumsAddPicture(Request request) {
+        User user = findUser(request.getUserName());
+        Response response = new Response();
+
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+
+        JsonObject payload = request.getPayload();
+        String albumName = payload.get("albumName").getAsString();
+        String pictureName = payload.get("pictureName").getAsString();
+
+        Album album = user.getAlbums().stream()
+                .filter(alb -> alb.getName().equals(albumName))
+                .findFirst()
+                .orElse(null);
+
+        if (album == null) {
+            response.setStatusCode(404);
+            response.setMessage("Album not found");
+            return response;
+        }
+
+        Picture picture = user.getPictures().stream()
+                .filter(pic -> pic.getName().equals(pictureName))
+                .findFirst()
+                .orElse(null);
+
+        if (picture == null) {
+            response.setStatusCode(404);
+            response.setMessage("Picture not found");
+            return response;
+        }
+        album.addPicture(picture);
+        try {
+            DataBase.saveUserToFile(user);
+            response.setStatusCode(200);
+            response.setMessage("Picture added to album successfully");
+        } catch (IOException e) {
+            response.setStatusCode(500);
+            response.setMessage("Failed to save");
+        }
+        return response;
+    }
+
+    public Response handleAlbumsRemovePicture(Request request) {
+        User user = findUser(request.getUserName());
+        Response response = new Response();
+
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+
+        JsonObject payload = request.getPayload();
+        String albumName = payload.get("albumName").getAsString();
+        String pictureName = payload.get("pictureName").getAsString();
+        Album album = user.getAlbums().stream()
+                .filter(alb -> alb.getName().equals(albumName))
+                .findFirst()
+                .orElse(null);
+
+        if (album == null) {
+            response.setStatusCode(404);
+            response.setMessage("Album not found");
+            return response;
+        }
+
+        Picture picture = user.getPictures().stream()
+                .filter(pic -> pic.getName().equals(pictureName))
+                .findFirst()
+                .orElse(null);
+
+        if (picture == null) {
+            response.setStatusCode(404);
+            response.setMessage("Picture not found");
+            return response;
+        }
+        album.removePicture(picture);
+        try {
+            DataBase.saveUserToFile(user);
+            response.setStatusCode(200);
+            response.setMessage("Picture removed from album successfully");
+        } catch (IOException e) {
+            response.setStatusCode(500);
+            response.setMessage("Failed to save");
+        }
+        return response;
+
     }
 
     public User findUser(String userName) {

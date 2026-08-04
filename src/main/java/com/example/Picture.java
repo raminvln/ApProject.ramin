@@ -10,7 +10,6 @@ public class Picture {
     // نمیاد
     private String name;
     private String ownerName;
-    private boolean commentsAllowed = false;
     private LocalDateTime timeOfAdd;
     private List<String> albumNames = new ArrayList<>();
     private List<String> tags = new ArrayList<>();
@@ -82,14 +81,6 @@ public class Picture {
 
     public String getName() {
         return name;
-    }
-
-    public boolean isCommentsAllowed() {
-        return commentsAllowed;
-    }
-
-    public void setCommentsAllowed(boolean commentsAllowed) {
-        this.commentsAllowed = commentsAllowed;
     }
 
     public void addTag(String tag) {
