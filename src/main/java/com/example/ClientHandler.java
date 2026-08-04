@@ -7,7 +7,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import java.util.List;
 
 public class ClientHandler implements Runnable {
     private Socket socket;
@@ -64,6 +63,12 @@ public class ClientHandler implements Runnable {
                     break;
                 case "/albums/remove-picture":
                     response = handleAlbumsRemovePicture(request);
+                    break;
+                case "/albums/copy-picture":
+                    response = handleAlbumsCopyPicture(request);
+                    break;
+                case "/albums/move-picture":
+                    response = handleAlbumsMovePicture(request);
                     break;
                 default:
                     response.setStatusCode(404);
@@ -456,8 +461,124 @@ public class ClientHandler implements Runnable {
             response.setMessage("Failed to save");
         }
         return response;
-
     }
+
+    public Response handleAlbumsCopyPicture(Request request) {
+        User user = findUser(request.getUserName());
+        Response response = new Response();
+
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+
+        JsonObject payload = request.getPayload();
+        String fromAlbumName = payload.get("fromAlbum").getAsString();
+        String toAlbumName = payload.get("toAlbum").getAsString();
+        String pictureName = payload.get("pictureName").getAsString();
+
+        Album fromAlbum = user.getAlbums().stream()
+                .filter(alb -> alb.getName().equals(fromAlbumName))
+                .findFirst()
+                .orElse(null);
+        if (fromAlbum == null) {
+            response.setStatusCode(404);
+            response.setMessage("Source album not found");
+            return response;
+        }
+        Album toAlbum = user.getAlbums().stream()
+                .filter(alb -> alb.getName().equals(toAlbumName))
+                .findFirst()
+                .orElse(null);
+        if (toAlbum == null) {
+            response.setStatusCode(404);
+            response.setMessage("Destination album not found");
+            return response;
+        }
+        Picture picture = user.getPictures().stream()
+                .filter(pic -> pic.getName().equals(pictureName))
+                .findFirst()
+                .orElse(null);
+        if (picture == null) {
+            response.setStatusCode(404);
+            response.setMessage("Picture not found");
+            return response;
+        }
+        user.copyImageToAlbum(picture, toAlbum);
+        try {
+            DataBase.saveUserToFile(user);
+            response.setStatusCode(200);
+            response.setMessage("Picture copied to album successfully");
+        } catch (IOException e) {
+            response.setStatusCode(500);
+            response.setMessage("Failed to save");
+        }
+        return response;
+    }
+
+    public Response handleAlbumsMovePicture(Request request) {
+        User user = findUser(request.getUserName());
+        Response response = new Response();
+
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+
+        JsonObject payload = request.getPayload();
+        String fromAlbumName = payload.get("fromAlbum").getAsString();
+        String toAlbumName = payload.get("toAlbum").getAsString();
+        String pictureName = payload.get("pictureName").getAsString();
+
+        Album fromAlbum = user.getAlbums().stream()
+                .filter(alb -> alb.getName().equals(fromAlbumName))
+                .findFirst()
+                .orElse(null);
+
+        if (fromAlbum == null) {
+            response.setStatusCode(404);
+            response.setMessage("Source album not found");
+            return response;
+        }
+
+        Album toAlbum = user.getAlbums().stream()
+                .filter(alb -> alb.getName().equals(toAlbumName))
+                .findFirst()
+                .orElse(null);
+
+        if (toAlbum == null) {
+            response.setStatusCode(404);
+            response.setMessage("Destination album not found");
+            return response;
+        }
+
+        Picture picture = user.getPictures().stream()
+                .filter(pic -> pic.getName().equals(pictureName))
+                .findFirst()
+                .orElse(null);
+
+        if (picture == null) {
+            response.setStatusCode(404);
+            response.setMessage("Picture not found");
+            return response;
+        }
+
+        user.moveImageToAnother(picture, fromAlbum, toAlbum);
+
+        try {
+            DataBase.saveUserToFile(user);
+            response.setStatusCode(200);
+            response.setMessage("Picture moved to album successfully");
+        } catch (IOException e) {
+            response.setStatusCode(500);
+            response.setMessage("Failed to save");
+        }
+
+        return response;
+    }
+    
 
     public User findUser(String userName) {
         return UserManager.getUsers().stream().filter(user1 -> user1.getUserName().equals(userName))
