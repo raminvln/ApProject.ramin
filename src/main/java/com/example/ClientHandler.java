@@ -70,6 +70,12 @@ public class ClientHandler implements Runnable {
                 case "/albums/move-picture":
                     response = handleAlbumsMovePicture(request);
                     break;
+                case "/profile":
+                    response = handleAlbumsMovePicture(request);
+                    break;
+                case "/profile/update-displayname":
+                    response = handleAlbumsMovePicture(request);
+                    break;
                 default:
                     response.setStatusCode(404);
                     response.setMessage("Route not found");
@@ -578,7 +584,55 @@ public class ClientHandler implements Runnable {
 
         return response;
     }
-    
+
+    public Response handleProfile(Request request) {
+        User user = findUser(request.getUserName());
+        Response response = new Response();
+
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+
+        JsonObject data = new JsonObject();
+        data.addProperty("displayName", user.getDisplayName());
+        data.addProperty("userName", user.getUserName());
+        data.addProperty("photoCount", user.getPictures().size());
+        data.addProperty("albumCount", user.getAlbums().size());
+
+        response.setStatusCode(200);
+        response.setMessage("Profile loaded");
+        response.setPayload(data);
+        return response;
+    }
+
+    public Response handleProfileUpdateDisplayname(Request request) {
+        User user = findUser(request.getUserName());
+        Response response = new Response();
+
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+
+        JsonObject payload = request.getPayload();
+        String newDisplayName = payload.get("displayName").getAsString();
+
+        user.setDisplayName(newDisplayName);
+
+        try {
+            DataBase.saveUserToFile(user);
+            response.setStatusCode(200);
+            response.setMessage("Display name updated");
+        } catch (IOException e) {
+            response.setStatusCode(500);
+            response.setMessage("Failed to save");
+        }
+
+        return response;
+    }
 
     public User findUser(String userName) {
         return UserManager.getUsers().stream().filter(user1 -> user1.getUserName().equals(userName))
