@@ -5,6 +5,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -71,10 +75,16 @@ public class ClientHandler implements Runnable {
                     response = handleAlbumsMovePicture(request);
                     break;
                 case "/profile":
-                    response = handleAlbumsMovePicture(request);
+                    response = handleProfile(request);
                     break;
                 case "/profile/update-displayname":
-                    response = handleAlbumsMovePicture(request);
+                    response = handleProfileUpdateDisplayname(request);
+                    break;
+                case "/profile/update-password":
+                    response = handleProfileUpdatePassword(request);
+                    break;
+                case "/search":
+                    response = handleSearch(request);
                     break;
                 default:
                     response.setStatusCode(404);
@@ -634,9 +644,87 @@ public class ClientHandler implements Runnable {
         return response;
     }
 
+    public Response handleProfileUpdatePassword(Request request) {
+        User user = findUser(request.getUserName());
+        Response response = new Response();
+
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+
+        JsonObject payload = request.getPayload();
+        String currentPassword = payload.get("currentPassword").getAsString();
+        String newPassword = payload.get("newPassword").getAsString();
+
+        if (!user.getPassword().equals(currentPassword)) {
+            response.setStatusCode(401);
+            response.setMessage("Current password is incorrect");
+            return response;
+        }
+
+        if (!UserManager.isPasswordAllowed(newPassword)) {
+            response.setStatusCode(400);
+            response.setMessage("New password is not allowed");
+            return response;
+        }
+
+        user.setPassword(newPassword);
+
+        try {
+            DataBase.saveUserToFile(user);
+            response.setStatusCode(200);
+            response.setMessage("Password updated");
+        } catch (IOException e) {
+            response.setStatusCode(500);
+            response.setMessage("Failed to save");
+        }
+
+        return response;
+    }
+
+    public Response handleSearch(Request request) {
+        User user = findUser(request.getUserName());
+        Response response = new Response();
+
+        if (user == null) {
+            response.setStatusCode(404);
+            response.setMessage("User not found");
+            return response;
+        }
+
+        JsonObject payload = request.getPayload();
+        String query = payload.get("query").getAsString();
+        String type = payload.get("type").getAsString(); // name, tag, album, date
+        List<Picture> results = new ArrayList<>();
+
+        switch (type) {
+            case "name":
+                results = SearchManager.searchByName(query, user);
+                break;
+            case "tag":
+                results = SearchManager.searchByTag(query, user);
+                break;
+            case "album":
+                results = SearchManager.searchByAlbum(query, user);
+                break;
+            case "date":
+                LocalDate date = LocalDate.parse(query);
+                results = SearchManager.searchByDate(date, user);
+                break;
+        }
+
+        JsonObject data = new JsonObject();
+        data.add("results", new Gson().toJsonTree(results));
+        response.setStatusCode(200);
+        response.setMessage("Search completed");
+        response.setPayload(data);
+        return response;
+    }
+
     public User findUser(String userName) {
         return UserManager.getUsers().stream().filter(user1 -> user1.getUserName().equals(userName))
                 .findFirst().orElse(null);
     }
-
 }
