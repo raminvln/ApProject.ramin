@@ -59,10 +59,6 @@ public class Picture {
         return tags;
     }
 
-    public String getCaptions() {
-        return caption;
-    }
-
     public List<String> getPeopleInPicture() {
         return peopleInPicture;
     }
