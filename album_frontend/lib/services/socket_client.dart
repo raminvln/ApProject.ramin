@@ -21,4 +21,19 @@ class SocketClient {
     socket.destroy();
     return jsonDecode(utf8.decode(response));
   }
+  
+  static Future<Map<String, dynamic>> register({
+  required String username,
+  required String password,
+}) async {
+  return await send(
+    method: "POST",
+    userName: username,
+    route: "/register",
+    payload: {
+      "username": username,
+      "password": password,
+    },
+  );
+}
 }
