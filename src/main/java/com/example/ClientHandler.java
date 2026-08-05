@@ -96,6 +96,8 @@ public class ClientHandler implements Runnable {
             }
             String responString = gson.toJson(response);
             out.println(responString);
+            out.flush();
+socket.close();
 
         } catch (IOException e) {
             e.printStackTrace();
