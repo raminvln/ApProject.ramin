@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:album_frontend/models/photo_model.dart';
 import 'package:album_frontend/screens/photo_detail_page.dart';
 import 'package:album_frontend/screens/upload_page.dart';
-import 'package:album_frontend/services/mock_data.dart';
-import 'package:album_frontend/services/search_service.dart';
+import 'package:album_frontend/services/socket_client.dart';
+import 'package:album_frontend/services/session.dart';
 import 'package:album_frontend/widgets/bottom_nav_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,12 +14,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late List<PhotoModel> _allPhotos;
-  late Map<String, List<PhotoModel>> _groupedPhotos;
+  List<PhotoModel> _allPhotos = [];
+  Map<String, List<PhotoModel>> _groupedPhotos = {};
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   String _sortBy = 'Latest';
   String _filterBy = 'All';
+
+  bool _isLoading = true;
+  String? _loadError;
 
   // Multi-select state
   bool _isSelecting = false;
@@ -28,8 +31,7 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _allPhotos = MockData.getPhotos();
-    _applyFilterAndSort();
+    _loadPhotos();
   }
 
   @override
@@ -39,13 +41,60 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  void _onSearchChanged(String query) {
-    if (query.isEmpty) {
-      _allPhotos = MockData.getPhotos();
-    } else {
-      _allPhotos = SearchService.searchAll(query, MockData.getPhotos(), {});
+  Future<void> _loadPhotos() async {
+    setState(() {
+      _isLoading = true;
+      _loadError = null;
+    });
+
+    try {
+      final response = await SocketClient.send(
+        method: 'GET',
+        userName: Session.currentUserName!,
+        route: '/pictures',
+        payload: {},
+      );
+
+      if (response['statusCode'] == 200) {
+        final List raw = response['payload']['pictures'];
+        _allPhotos = raw.map((j) => PhotoModel.fromJson(j)).toList();
+        _applyFilterAndSort();
+      } else {
+        setState(() {
+          _loadError = response['message'] ?? 'Failed to load photos';
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _loadError = 'Could not connect to server';
+      });
+    } finally {
+      setState(() => _isLoading = false);
     }
-    _applyFilterAndSort();
+  }
+
+  Future<void> _onSearchChanged(String query) async {
+    if (query.isEmpty) {
+      await _loadPhotos();
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final response = await SocketClient.send(
+        method: 'POST',
+        userName: Session.currentUserName!,
+        route: '/search',
+        payload: {'query': query, 'type': 'name'},
+      );
+      if (response['statusCode'] == 200) {
+        final List raw = response['payload']['results'];
+        _allPhotos = raw.map((j) => PhotoModel.fromJson(j)).toList();
+        _applyFilterAndSort();
+      }
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   void _applyFilterAndSort() {
@@ -70,7 +119,7 @@ class _HomePageState extends State<HomePage> {
         break;
     }
 
-    var grouped = MockData.groupByDate(photos);
+    var grouped = _groupByDate(photos);
 
     if (_sortBy != 'Latest') {
       Map<String, List<PhotoModel>> sortedGrouped = {};
@@ -89,6 +138,37 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _groupedPhotos = grouped;
     });
+  }
+
+  // moved out of MockData since MockData is being removed
+  Map<String, List<PhotoModel>> _groupByDate(List<PhotoModel> photos) {
+    Map<String, List<PhotoModel>> grouped = {};
+    for (var photo in photos) {
+      String key = _getDateLabel(photo.dateAdded);
+      grouped.putIfAbsent(key, () => []).add(photo);
+    }
+    return grouped;
+  }
+
+  String _getDateLabel(DateTime date) {
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+    DateTime photoDate = DateTime(date.year, date.month, date.day);
+
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    if (photoDate == today) {
+      return 'Today';
+    } else if (photoDate == today.subtract(const Duration(days: 1))) {
+      return 'Yesterday';
+    } else if (date.year == now.year) {
+      return '${months[date.month - 1]} ${date.day}';
+    } else {
+      return '${months[date.month - 1]} ${date.day}, ${date.year}';
+    }
   }
 
   void _toggleSelection(String photoId) {
@@ -132,21 +212,36 @@ class _HomePageState extends State<HomePage> {
             child: const Text('Cancel'),
           ),
           ElevatedButton(
-            onPressed: () {
+            onPressed: () async {
               Navigator.pop(dialogContext);
+
+              final idsToDelete = List<String>.from(_selectedPhotoIds);
+              for (final photoId in idsToDelete) {
+                final photo = _allPhotos.firstWhere((p) => p.id == photoId);
+                await SocketClient.send(
+                  method: 'POST',
+                  userName: Session.currentUserName!,
+                  route: '/pictures/delete',
+                  payload: {'pictureName': photo.title},
+                );
+              }
+
               setState(() {
                 _allPhotos.removeWhere((p) => _selectedPhotoIds.contains(p.id));
                 _selectedPhotoIds.clear();
                 _isSelecting = false;
                 _applyFilterAndSort();
               });
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('$count photo(s) deleted'),
-                  backgroundColor: Colors.green,
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
+
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('$count photo(s) deleted'),
+                    backgroundColor: Colors.green,
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red,
@@ -237,19 +332,39 @@ class _HomePageState extends State<HomePage> {
               child: const Text('Cancel'),
             ),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 Navigator.pop(dialogContext);
+
+                final idsSelected = List<String>.from(_selectedPhotoIds);
+                for (final photoId in idsSelected) {
+                  final photo = _allPhotos.firstWhere((p) => p.id == photoId);
+                  for (final albumName in selectedAlbums) {
+                    await SocketClient.send(
+                      method: 'POST',
+                      userName: Session.currentUserName!,
+                      route: '/albums/add-picture',
+                      payload: {
+                        'albumName': albumName,
+                        'pictureName': photo.title,
+                      },
+                    );
+                  }
+                }
+
                 setState(() {
                   _selectedPhotoIds.clear();
                   _isSelecting = false;
                 });
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Added to ${selectedAlbums.length} album(s)'),
-                    backgroundColor: Colors.green,
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
+
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Added to ${selectedAlbums.length} album(s)'),
+                      backgroundColor: Colors.green,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                }
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF2563EB),
@@ -429,24 +544,29 @@ class _HomePageState extends State<HomePage> {
           children: [
             _buildHeader(),
             Expanded(
-              child: Scrollbar(
-                controller: _scrollController,
-                thickness: 4,
-                radius: const Radius.circular(8),
-                child: ListView.builder(
-                  controller: _scrollController,
-                  physics: const BouncingScrollPhysics(
-                    decelerationRate: ScrollDecelerationRate.fast,
-                  ),
-                  padding: EdgeInsets.only(bottom: 80),
-                  itemCount: _groupedPhotos.keys.length,
-                  itemBuilder: (context, index) {
-                    String dateKey = _groupedPhotos.keys.elementAt(index);
-                    List<PhotoModel> photos = _groupedPhotos[dateKey]!;
-                    return _buildDateSection(dateKey, photos);
-                  },
-                ),
-              ),
+              child: _isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : _loadError != null
+                      ? _buildErrorState()
+                      : Scrollbar(
+                          controller: _scrollController,
+                          thickness: 4,
+                          radius: const Radius.circular(8),
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            physics: const BouncingScrollPhysics(
+                              decelerationRate: ScrollDecelerationRate.fast,
+                            ),
+                            padding: const EdgeInsets.only(bottom: 80),
+                            itemCount: _groupedPhotos.keys.length,
+                            itemBuilder: (context, index) {
+                              String dateKey =
+                                  _groupedPhotos.keys.elementAt(index);
+                              List<PhotoModel> photos = _groupedPhotos[dateKey]!;
+                              return _buildDateSection(dateKey, photos);
+                            },
+                          ),
+                        ),
             ),
           ],
         ),
@@ -455,6 +575,27 @@ class _HomePageState extends State<HomePage> {
       bottomNavigationBar: _isSelecting
           ? _buildSelectionBar()
           : const BottomNavBar(currentIndex: 0),
+    );
+  }
+
+  Widget _buildErrorState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.wifi_off, size: 64, color: Colors.grey[400]),
+          const SizedBox(height: 16),
+          Text(
+            _loadError ?? 'Something went wrong',
+            style: TextStyle(color: Colors.grey[500], fontSize: 16),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _loadPhotos,
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -738,7 +879,6 @@ class _HomePageState extends State<HomePage> {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                // Selection overlay
                 if (_isSelecting)
                   Positioned(
                     top: 6,
@@ -871,10 +1011,15 @@ class _HomePageState extends State<HomePage> {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const UploadPage()),
-          ),
+          onTap: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UploadPage()),
+            );
+            if (result == true) {
+              _loadPhotos(); // refresh after a successful upload
+            }
+          },
           customBorder: const CircleBorder(),
           child: const Center(
             child: Icon(Icons.add, color: Colors.white, size: 30),
