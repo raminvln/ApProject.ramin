@@ -1,3 +1,3 @@
-class Session {
+class session {
   static String? currentUserName;
 }
