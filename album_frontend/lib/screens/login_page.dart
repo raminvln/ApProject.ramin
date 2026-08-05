@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:album_frontend/services/socket_client.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
