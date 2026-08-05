@@ -5,7 +5,7 @@ import com.google.gson.JsonObject;
 
 public class Request {
     private String method;
-    private String userName;
+    private String username;
     private String route;
     private JsonObject payload;
     public String getMethod() {
@@ -14,11 +14,11 @@ public class Request {
     public void setMethod(String method) {
         this.method = method;
     }
-    public String getUserName() {
-        return userName;
+    public String getusername() {
+        return username;
     }
-    public void setUserName(String userName) {
-        this.userName = userName;
+    public void setusername(String username) {
+        this.username = username;
     }
     public String getRoute() {
         return route;
