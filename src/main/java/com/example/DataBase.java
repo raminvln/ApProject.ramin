@@ -33,8 +33,9 @@ public class DataBase {
                 .setPrettyPrinting()
                 .create();
         List<User> users = new ArrayList<>();
-
-        Files.list(Path.of("src/users")).forEach(path -> {
+        Path dir = Path.of("src/users");
+        if (!Files.exists(dir)) Files.createDirectories(dir);
+        Files.list(dir).forEach(path -> {
             try {
                 String json = Files.readString(path);
                 User user = gson.fromJson(json, User.class);
