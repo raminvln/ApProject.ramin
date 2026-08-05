@@ -95,34 +95,37 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-  void _login() {
-    String userName = _usernameController.text.trim();
-    String password = _passwordController.text;
+void _login() async {
+  String userName = _usernameController.text.trim();
+  String password = _passwordController.text;
 
-    // چک خالی بودن
-    if (userName.isEmpty || password.isEmpty) {
-      _showError('Please fill all fields');
-      return;
-    }
-
-    // چک فرمت userName
-    if (!_isValidUserName(userName)) {
-      _showError('Invalid email or phone format');
-      return;
-    }
-
-    // چک فرمت password
-    if (!_isValidPassword(password, userName)) {
-      return;
-    }
-
-    // چک لاگین
-    if (userName == 'admin@mail.com' && password == 'Test1234') {
-      Navigator.pushReplacementNamed(context, '/home');
-    } else {
-      _showError('Invalid email or password');
-    }
+  if (userName.isEmpty || password.isEmpty) {
+    _showError('Please fill all fields');
+    return;
   }
+
+  if (!_isValidUserName(userName)) {
+    _showError('Invalid email or phone format');
+    return;
+  }
+
+  if (!_isValidPassword(password, userName)) {
+    return;
+  }
+
+  final response = await SocketClient.send(
+    method: 'POST',
+    userName: userName,
+    route: '/login',
+    payload: {'userName': userName, 'password': password},
+  );
+
+  if (response['statusCode'] == 200) {
+    Navigator.pushReplacementNamed(context, '/home');
+  } else {
+    _showError(response['message']);
+  }
+}
 
   @override
   Widget build(BuildContext context) {
