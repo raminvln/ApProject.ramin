@@ -21,7 +21,10 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        try {
+        try (Socket s = socket;
+         PrintWriter out = new PrintWriter(s.getOutputStream(), true);
+         BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream())))
+        {
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             StringBuilder json = new StringBuilder();
