@@ -4,14 +4,14 @@ import 'dart:convert';
 class SocketClient {
   static Future<Map<String, dynamic>> send({
     required String method,
-    required String userName,
+    required String username,
     required String route,
     required Map<String, dynamic> payload,
   }) async {
     final socket = await Socket.connect('YOUR_SERVER_IP', 8080);
     final request = jsonEncode({
       'method': method,
-      'userName': userName,
+      'username': username,
       'route': route,
       'payload': payload,
     });
@@ -28,7 +28,7 @@ class SocketClient {
 }) async {
   return await send(
     method: "POST",
-    userName: username,
+    username: username,
     route: "/register",
     payload: {
       "username": username,
