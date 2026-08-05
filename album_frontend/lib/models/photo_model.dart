@@ -26,4 +26,16 @@ class PhotoModel {
     this.comments = const [],
     this.isPublic = true,
   });
+  factory PhotoModel.fromJson(Map<String, dynamic> json) {
+  return PhotoModel(
+    id: json['name'] ?? '',
+    url: 'assets/photos/placeholder.jpg', // server doesn't send image bytes
+    title: json['name'] ?? '',
+    caption: json['caption'],
+    isFavorite: json['isLikedByTheOwner'] ?? false,
+    dateAdded: DateTime.tryParse(json['timeOfAdd'] ?? '') ?? DateTime.now(),
+    ownerName: json['ownerName'] ?? '',
+    tags: List<String>.from(json['tags'] ?? []),
+  );
+}
 }
