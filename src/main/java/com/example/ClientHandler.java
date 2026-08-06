@@ -19,90 +19,87 @@ public class ClientHandler implements Runnable {
         this.socket = socket;
     }
 
-    @Override
-    public void run() {
-        try (Socket s = socket;
+@Override
+public void run() {
+    try (Socket s = socket;
          PrintWriter out = new PrintWriter(s.getOutputStream(), true);
          BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream())))
-        {
-            PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            StringBuilder json = new StringBuilder();
-            String line;
-            while ((line = in.readLine()) != null && !line.isEmpty()) {
-                json.append(line);
-            }
-            String jsonString = json.toString();
-            Gson gson = new Gson();
-            Request request = gson.fromJson(jsonString, Request.class);
-            Response response = new Response();
-            switch (request.getRoute()) {
-
-                case "/login":
-                    response = handleLogin(request);
-                    break;
-                case "/register":
-                    response = handleRegister(request);
-                    break;
-                case "/pictures":
-                    response = handlePictures(request);
-                    break;
-                case "/pictures/add":
-                    response = handlePicturesAdd(request);
-                    break;
-                case "/pictures/delete":
-                    response = handlePicturesDelete(request);
-                    break;
-                case "/pictures/favorite":
-                    response = handlePicturesFavorite(request);
-                    break;
-                case "/albums":
-                    response = handleAlbums(request);
-                    break;
-                case "/albums/create":
-                    response = handleAlbumsCreate(request);
-                    break;
-                case "/albums/delete":
-                    response = handleAlbumsDelete(request);
-                    break;
-                case "/albums/add-picture":
-                    response = handleAlbumsAddPicture(request);
-                    break;
-                case "/albums/remove-picture":
-                    response = handleAlbumsRemovePicture(request);
-                    break;
-                case "/albums/copy-picture":
-                    response = handleAlbumsCopyPicture(request);
-                    break;
-                case "/albums/move-picture":
-                    response = handleAlbumsMovePicture(request);
-                    break;
-                case "/profile":
-                    response = handleProfile(request);
-                    break;
-                case "/profile/update-displayname":
-                    response = handleProfileUpdateDisplayname(request);
-                    break;
-                case "/profile/update-password":
-                    response = handleProfileUpdatePassword(request);
-                    break;
-                case "/search":
-                    response = handleSearch(request);
-                    break;
-                default:
-                    response.setStatusCode(404);
-                    response.setMessage("Route not found");
-                    break;
-            }
-            String responString = gson.toJson(response);
-            out.println(responString);
-            out.flush();
-socket.close();
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    {
+        String jsonString = in.readLine(); // one JSON object per line — don't loop
+        if (jsonString == null) {
+            return;
         }
+
+        Gson gson = new Gson();
+        Request request = gson.fromJson(jsonString, Request.class);
+        Response response = new Response();
+
+        switch (request.getRoute()) {
+            case "/login":
+                response = handleLogin(request);
+                break;
+            case "/register":
+                response = handleRegister(request);
+                break;
+            case "/pictures":
+                response = handlePictures(request);
+                break;
+            case "/pictures/add":
+                response = handlePicturesAdd(request);
+                break;
+            case "/pictures/delete":
+                response = handlePicturesDelete(request);
+                break;
+            case "/pictures/favorite":
+                response = handlePicturesFavorite(request);
+                break;
+            case "/albums":
+                response = handleAlbums(request);
+                break;
+            case "/albums/create":
+                response = handleAlbumsCreate(request);
+                break;
+            case "/albums/delete":
+                response = handleAlbumsDelete(request);
+                break;
+            case "/albums/add-picture":
+                response = handleAlbumsAddPicture(request);
+                break;
+            case "/albums/remove-picture":
+                response = handleAlbumsRemovePicture(request);
+                break;
+            case "/albums/copy-picture":
+                response = handleAlbumsCopyPicture(request);
+                break;
+            case "/albums/move-picture":
+                response = handleAlbumsMovePicture(request);
+                break;
+            case "/profile":
+                response = handleProfile(request);
+                break;
+            case "/profile/update-displayname":
+                response = handleProfileUpdateDisplayname(request);
+                break;
+            case "/profile/update-password":
+                response = handleProfileUpdatePassword(request);
+                break;
+            case "/search":
+                response = handleSearch(request);
+                break;
+            default:
+                response.setStatusCode(404);
+                response.setMessage("Route not found");
+                break;
+        }
+
+        String responseString = gson.toJson(response);
+        out.println(responseString);
+        out.flush();
+        // socket, out, in are closed automatically by try-with-resources
+    } catch (IOException e) {
+        e.printStackTrace();
     }
+}
 
     /////////////////////
     /////////////////////
