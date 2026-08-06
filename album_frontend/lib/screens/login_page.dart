@@ -96,6 +96,11 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
+import 'package:album_frontend/services/socket_client.dart';
+import 'package:album_frontend/services/session.dart';
+
+// ...inside _LoginPageState:
+
 void _login() async {
   String userName = _usernameController.text.trim();
   String password = _passwordController.text;
@@ -114,17 +119,22 @@ void _login() async {
     return;
   }
 
-  final response = await SocketClient.send(
-    method: 'POST',
-    userName: userName,
-    route: '/login',
-    payload: {'userName': userName, 'password': password},
-  );
+  try {
+    final response = await SocketClient.login(
+      userName: userName,
+      password: password,
+    );
 
-  if (response['statusCode'] == 200) {
-    Navigator.pushReplacementNamed(context, '/home');
-  } else {
-    _showError(response['message']);
+    if (response['statusCode'] == 200) {
+      Session.currentUserName = userName; // <-- this was missing
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } else {
+      _showError(response['message'] ?? 'Login failed');
+    }
+  } catch (e) {
+    _showError('Could not connect to server');
   }
 }
 
