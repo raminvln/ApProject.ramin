@@ -2,23 +2,23 @@ package com.example;
 
 import com.google.gson.JsonObject;
 
-
 public class Request {
     private String method;
-    private String username;
+    private String userName;
     private String route;
     private JsonObject payload;
+
     public String getMethod() {
         return method;
     }
     public void setMethod(String method) {
         this.method = method;
     }
-    public String getusername() {
-        return username;
+    public String getUserName() {
+        return userName;
     }
-    public void setusername(String username) {
-        this.username = username;
+    public void setUserName(String userName) {
+        this.userName = userName;
     }
     public String getRoute() {
         return route;
