@@ -38,4 +38,12 @@ class PhotoModel {
     tags: List<String>.from(json['tags'] ?? []),
   );
 }
+  Map<String, dynamic> toJson() {
+  return {
+    'name': title,
+    'caption': caption,
+    'isLikedByTheOwner': isFavorite,
+    'tags': tags,
+  };
+}
 }
