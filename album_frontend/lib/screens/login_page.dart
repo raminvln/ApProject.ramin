@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:album_frontend/services/socket_client.dart';
+import 'package:album_frontend/services/session.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -96,8 +97,6 @@ class _LoginPageState extends State<LoginPage>
     );
   }
 
-import 'package:album_frontend/services/socket_client.dart';
-import 'package:album_frontend/services/session.dart';
 
 // ...inside _LoginPageState:
 
