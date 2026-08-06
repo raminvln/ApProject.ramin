@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:album_frontend/services/socket_client.dart';
+import 'package:album_frontend/services/session.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -97,31 +99,45 @@ class _SignUpPageState extends State<SignUpPage>
     );
   }
 
-  void _signUp() {
-    String displayName = _displayNameController.text.trim();
-    String userName = _userNameController.text.trim();
-    String password = _passwordController.text;
 
-    // چک خالی بودن
-    if (displayName.isEmpty || userName.isEmpty || password.isEmpty) {
-      _showError('Please fill all fields');
-      return;
-    }
+void _signUp() async {
+  String displayName = _displayNameController.text.trim();
+  String userName = _userNameController.text.trim();
+  String password = _passwordController.text;
 
-    // چک فرمت userName
-    if (!_isValidUserName(userName)) {
-      _showError('Invalid email or phone format');
-      return;
-    }
-
-    // چک فرمت password
-    if (!_isValidPassword(password, userName)) {
-      return;
-    }
-
-    // TODO: ذخیره کاربر و رفتن به صفحه اصلی
-    Navigator.pushReplacementNamed(context, '/home');
+  if (displayName.isEmpty || userName.isEmpty || password.isEmpty) {
+    _showError('Please fill all fields');
+    return;
   }
+
+  if (!_isValidUserName(userName)) {
+    _showError('Invalid email or phone format');
+    return;
+  }
+
+  if (!_isValidPassword(password, userName)) {
+    return;
+  }
+
+  try {
+    final response = await SocketClient.register(
+      displayName: displayName,
+      userName: userName,
+      password: password,
+    );
+
+    if (response['statusCode'] == 200) {
+      Session.currentUserName = userName;
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    } else {
+      _showError(response['message'] ?? 'Sign up failed');
+    }
+  } catch (e) {
+    _showError('Could not connect to server');
+  }
+}
 
   @override
   Widget build(BuildContext context) {
