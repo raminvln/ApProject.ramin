@@ -5,7 +5,7 @@ import 'dart:async';
 class SocketClient {
   // Change this to 10.0.2.2 for Android emulator, 127.0.0.1 for iOS
   // simulator, or your machine's LAN IP for a physical device.
-  static const String serverIp = 'YOUR_SERVER_IP';
+  static const String serverIp = 10.0.2.2;
 
   static Future<Map<String, dynamic>> send({
     required String method,
