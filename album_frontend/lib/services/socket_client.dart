@@ -3,13 +3,17 @@ import 'dart:convert';
 import 'dart:async';
 
 class SocketClient {
+  // Change this to 10.0.2.2 for Android emulator, 127.0.0.1 for iOS
+  // simulator, or your machine's LAN IP for a physical device.
+  static const String serverIp = 'YOUR_SERVER_IP';
+
   static Future<Map<String, dynamic>> send({
     required String method,
     required String userName,
     required String route,
     required Map<String, dynamic> payload,
   }) async {
-    final socket = await Socket.connect('YOUR_SERVER_IP', 8080);
+    final socket = await Socket.connect(serverIp, 8080);
 
     final request = jsonEncode({
       'method': method,
@@ -29,24 +33,40 @@ class SocketClient {
       onError: (e) => completer.completeError(e),
     );
 
-    final raw = await completer.future.timeout(const Duration(seconds: 10));
-    socket.destroy();
-    return jsonDecode(raw) as Map<String, dynamic>;
+    try {
+      final raw = await completer.future.timeout(const Duration(seconds: 10));
+      return jsonDecode(raw) as Map<String, dynamic>;
+    } finally {
+      socket.destroy();
+    }
   }
 
   static Future<Map<String, dynamic>> register({
-    required String username,
+    required String displayName,
+    required String userName,
     required String password,
   }) async {
-    return await send(
-      method: "POST",
-      userName: username,
-      route: "/register",
+    return send(
+      method: 'POST',
+      userName: userName,
+      route: '/register',
       payload: {
-        "displayName": username,
-        "userName": username,
-        "password": password,
+        'displayName': displayName,
+        'userName': userName,
+        'password': password,
       },
+    );
+  }
+
+  static Future<Map<String, dynamic>> login({
+    required String userName,
+    required String password,
+  }) async {
+    return send(
+      method: 'POST',
+      userName: userName,
+      route: '/login',
+      payload: {'userName': userName, 'password': password},
     );
   }
 }
